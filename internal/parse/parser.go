@@ -23,40 +23,41 @@ func ReadExcel(path string) {
 
 		//read all rows and columns of a sheet
 		rows := readRows(sheetName, file)
+		rows = rows
 		cols := readColumns(sheetName, file)
 
 		var SecondaryCostCentres []int
 
-		//
+		//iterates over cells in the second column, skipping the first row
 		for colCellIndex, colCell := range cols[1][1:] {
 			if colCell != "" {
 				SecondaryCostCentres = append(SecondaryCostCentres, colCellIndex+1)
 			}
 		}
 
-		//for rowIndex, row := range rows {
-		//	if rowIndex != 0 {
-		//		for colCellIndex, colCell := range row {
-		//			if colCellIndex == 1 && colCell != "" {
-		//				SecondaryCostCentres = append(SecondaryCostCentres, rowIndex)
-		//			}
-		//
-		//		}
-		//	}
-		//}
-
 		//printerino
-		for rowIndex, row := range rows {
-			if rowIndex != 0 {
-				for colCellIndex, colCell := range row {
-					if colCellIndex == 2 && colCell != "" {
-						fmt.Print(sheetName + "\t" + colCell + "\t")
-						fmt.Print("\n")
-					}
-				}
+		//TODO remove
+		for _, colCell := range cols[2][1:] {
+			if colCell != "" {
+				fmt.Print(sheetName + "\t" + colCell + "\t")
+				fmt.Print("\n")
 			}
 		}
+
 		fmt.Println(SecondaryCostCentres)
+
+		for _, SecondaryCostCentre := range SecondaryCostCentres {
+			for colCellIndex, colCell := range cols[2][SecondaryCostCentre+1:] {
+				colCellIndex = colCellIndex
+				if colCell == "" {
+					break
+				} else {
+					fmt.Print(sheetName + "\t" + strconv.Itoa(SecondaryCostCentre) + "\t" + colCell + "\t")
+					fmt.Print("\n")
+				}
+
+			}
+		}
 
 		for SecondaryCostCentreIndex, SecondaryCostCentre := range SecondaryCostCentres {
 			var budgetLines []string
@@ -116,4 +117,8 @@ func readColumns(sheetName string, file *excelize.File) [][]string {
 	}
 
 	return cols
+}
+
+func getSecondaryCostCentreByIndex(index int) string {
+	return ""
 }

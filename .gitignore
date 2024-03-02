@@ -22,4 +22,4 @@ go.work
 
 # Smelly bloat files
 *.idea
-/test/~$.*
+/test/~$*.xlsx

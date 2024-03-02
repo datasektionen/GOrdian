@@ -35,15 +35,6 @@ func ReadExcel(path string) {
 			}
 		}
 
-		//printerino
-		//TODO remove
-		for _, colCell := range cols[2][1:] {
-			if colCell != "" {
-				fmt.Print(sheetName + "\t" + colCell + "\t")
-				fmt.Print("\n")
-			}
-		}
-
 		fmt.Println(SecondaryCostCentres)
 
 		for _, SecondaryCostCentre := range SecondaryCostCentres {

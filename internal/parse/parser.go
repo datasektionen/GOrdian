@@ -3,6 +3,7 @@ package parse
 import (
 	"fmt"
 	"github.com/xuri/excelize/v2"
+	"log"
 )
 
 const (
@@ -87,15 +88,15 @@ func readRows(sheetName string, file *excelize.File) ([][]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read rows: %v", err)
 	}
-	return rows, nil
+	return rows, err
 }
 
 func readColumns(sheetName string, file *excelize.File) ([][]string, error) {
 	cols, err := file.GetCols(sheetName)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read columns: %v", err)
+		log.Printf("error closing Excel file: %v", err)
 	}
-	return cols, nil
+	return cols, err
 }
 
 func findSecondaryCostCentreIndices(cols [][]string) []int {

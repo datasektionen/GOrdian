@@ -28,26 +28,37 @@ func ReadExcel(path string) {
 		var SecondaryCostCentres []int
 
 		//iterates over cells in the second column, skipping the first row
+		//finds all Secondary cost centres and appends their index to a slice
 		for colCellIndex, colCell := range cols[1][1:] {
 			if colCell != "" {
 				SecondaryCostCentres = append(SecondaryCostCentres, colCellIndex+1)
 			}
 		}
 
+		//iterates over the found secondary cost centres indices
 		for _, secondaryCostCentre := range SecondaryCostCentres {
 			var secondaryCostCentreName = cols[1][secondaryCostCentre]
+
+			//loops over the column containing budget lines. Starting one row below the current sec cost centre
 			for colCellIndex, budgetLine := range cols[2][secondaryCostCentre+1:] {
 
 				if budgetLine == "" {
+					//When encountering an empty cell we have gone through all relevant budget lines
 					fmt.Print("\n")
 					break
 				} else {
+					//Find and print all relevant data
 					account := cols[3][colCellIndex+secondaryCostCentre+1]
 					income := cols[4][colCellIndex+secondaryCostCentre+1]
 					expense := cols[5][colCellIndex+secondaryCostCentre+1]
-					comment := cols[6][colCellIndex+secondaryCostCentre+1]
-					comment = comment
-					fmt.Print(sheetName + "\t" + secondaryCostCentreName + "\t" + budgetLine + "\t" + account + "\t" + income + "\t" + expense)
+					comment := cols[7][colCellIndex+secondaryCostCentre+1]
+					fmt.Print(sheetName + "\t")
+					fmt.Print(secondaryCostCentreName + "\t")
+					fmt.Print(budgetLine + "\t")
+					fmt.Print(account + "\t")
+					fmt.Print(income + "\t")
+					fmt.Print(expense + "\t")
+					fmt.Print(comment)
 					fmt.Print("\n")
 				}
 

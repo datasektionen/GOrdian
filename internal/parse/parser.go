@@ -58,23 +58,9 @@ func ReadExcel(path string) {
 		fmt.Println()
 	}
 
-	readCell(file)
-
 	if err := file.Close(); err != nil {
 		fmt.Println(err)
 	}
-}
-
-func readCell(file *excelize.File) {
-
-	cell, err := file.GetCellValue("3 - DKM Detaljbudget", "C9")
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Println(cell)
 }
 
 func readSheets(file *excelize.File) []string {

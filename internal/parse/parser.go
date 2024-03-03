@@ -5,12 +5,21 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-func ReadExcel(path string) {
+const (
+	columnSecondaryCostCentres = 1
+	columnBudgetLine           = 2
+	columnAccount              = 3
+	columnIncome               = 4
+	columnExpense              = 5
+	columnComment              = 7
+)
+
+func ReadExcel(path string) error {
 	file, err := excelize.OpenFile(path)
 
 	if err != nil {
 		fmt.Println(err)
-		return
+		return err
 	}
 
 	sheets := readSheets(file)
@@ -25,17 +34,16 @@ func ReadExcel(path string) {
 		rows = rows
 		cols := readColumns(sheetName, file)
 
-		var SecondaryCostCentreIndices []int
-
 		//get indices of all secondary cost centres
+		var SecondaryCostCentreIndices []int
 		SecondaryCostCentreIndices = findSecondaryCostCentreIndices(cols)
 
 		//iterates over the found secondary cost centres indices
 		for _, secondaryCostCentreIndex := range SecondaryCostCentreIndices {
-			var secondaryCostCentreName = getSecondaryCostCentreByIndex(secondaryCostCentreIndex, cols)
+			secondaryCostCentreName := getSecondaryCostCentreByIndex(secondaryCostCentreIndex, cols)
 
 			//loops over the column containing budget lines. Starting one row below the current sec cost centre
-			for colCellIndex, budgetLine := range cols[2][secondaryCostCentreIndex+1:] {
+			for colCellIndex, budgetLine := range cols[columnBudgetLine][secondaryCostCentreIndex+1:] {
 				if budgetLine == "" {
 					//When encountering an empty cell we have gone through all relevant budget lines
 					fmt.Print("\n")
@@ -58,34 +66,31 @@ func ReadExcel(path string) {
 		}
 	}
 
-	if err := file.Close(); err != nil {
+	err = file.Close()
+	if err != nil {
 		fmt.Println(err)
+		return err
 	}
+	return nil
 }
 
 func readSheets(file *excelize.File) []string {
-
 	return file.GetSheetList()
-
 }
 
 func readRows(sheetName string, file *excelize.File) [][]string {
 	rows, err := file.GetRows(sheetName)
-
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	return rows
 }
 
 func readColumns(sheetName string, file *excelize.File) [][]string {
 	cols, err := file.GetCols(sheetName)
-
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	return cols
 }
 
@@ -93,7 +98,7 @@ func findSecondaryCostCentreIndices(cols [][]string) []int {
 	var SecondaryCostCentreIndices []int
 	//iterates over cells in the second column, skipping the first row
 	//finds all Secondary cost centres and appends their index to a slice
-	for colCellIndex, colCell := range cols[1][1:] {
+	for colCellIndex, colCell := range cols[columnSecondaryCostCentres][1:] {
 		if colCell != "" {
 			//+1 is needed since 1st row is skipped
 			SecondaryCostCentreIndices = append(SecondaryCostCentreIndices, colCellIndex+1)
@@ -104,16 +109,16 @@ func findSecondaryCostCentreIndices(cols [][]string) []int {
 
 func getSecondaryCostCentreByIndex(secondaryCostCentreIndex int, cols [][]string) string {
 	//Secondary cost centres are always in the second column
-	return cols[1][secondaryCostCentreIndex]
+	return cols[columnSecondaryCostCentres][secondaryCostCentreIndex]
 }
 
 func getBudgetLineData(secondaryCostCentreIndex int, colCellIndex int, cols [][]string) (string, string, string, string) {
 
 	//Find all relevant data
 	//0s are gotten without kr for some reason
-	account := cols[3][colCellIndex+secondaryCostCentreIndex+1]
-	income := cols[4][colCellIndex+secondaryCostCentreIndex+1]
-	expense := cols[5][colCellIndex+secondaryCostCentreIndex+1]
-	comment := cols[7][colCellIndex+secondaryCostCentreIndex+1]
+	account := cols[columnAccount][colCellIndex+secondaryCostCentreIndex+1]
+	income := cols[columnIncome][colCellIndex+secondaryCostCentreIndex+1]
+	expense := cols[columnExpense][colCellIndex+secondaryCostCentreIndex+1]
+	comment := cols[columnComment][colCellIndex+secondaryCostCentreIndex+1]
 	return account, income, expense, comment
 }

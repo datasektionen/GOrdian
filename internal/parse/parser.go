@@ -31,7 +31,7 @@ func ReadExcel(path string) {
 
 		//iterates over the found secondary cost centres indices
 		for _, secondaryCostCentre := range SecondaryCostCentres {
-			var secondaryCostCentreName = cols[1][secondaryCostCentre]
+			var secondaryCostCentreName = getSecondaryCostCentreByIndex(secondaryCostCentre, cols)
 
 			//loops over the column containing budget lines. Starting one row below the current sec cost centre
 			for colCellIndex, budgetLine := range cols[2][secondaryCostCentre+1:] {
@@ -104,7 +104,6 @@ func findSecondaryCostCentres(cols [][]string) []int {
 	return SecondaryCostCentres
 }
 
-func getSecondaryCostCentreByIndex(index int) string {
-
-	return ""
+func getSecondaryCostCentreByIndex(secondaryCostCentreIndex int, cols [][]string) string {
+	return cols[1][secondaryCostCentreIndex]
 }

@@ -18,9 +18,13 @@ func ReadExcel(path string) error {
 	file, err := excelize.OpenFile(path)
 
 	if err != nil {
-		fmt.Println(err)
-		return err
+		return fmt.Errorf("failed to open Excel file: %v", err)
 	}
+	defer func() {
+		if err := file.Close(); err != nil {
+			_ = fmt.Errorf("error closing Excel file: %v", err)
+		}
+	}()
 
 	sheets := readSheets(file)
 
@@ -30,9 +34,15 @@ func ReadExcel(path string) error {
 		fmt.Printf("Sheet Name: %s, Index %d\n", sheetName, sheetIndex)
 
 		//read all rows and columns of a sheet
-		rows := readRows(sheetName, file)
+		rows, err := readRows(sheetName, file)
+		if err != nil {
+			return fmt.Errorf("failed to read rows for sheet %s: %v", sheetName, err)
+		}
 		rows = rows
-		cols := readColumns(sheetName, file)
+		cols, err := readColumns(sheetName, file)
+		if err != nil {
+			return fmt.Errorf("failed to read columns for sheet %s: %v", sheetName, err)
+		}
 
 		//get indices of all secondary cost centres
 		var SecondaryCostCentreIndices []int
@@ -51,7 +61,7 @@ func ReadExcel(path string) error {
 				} else {
 					account, income, expense, comment := getBudgetLineData(secondaryCostCentreIndex, colCellIndex, cols)
 					//Print all relevant data
-					//We already have sheetname from outmost loop and secondaryCostCentreName from inner loop
+					//We already have sheetName from outmost loop and secondaryCostCentreName from inner loop
 					//0s are gotten without kr for some reason
 					fmt.Print(sheetName + "\t")
 					fmt.Print(secondaryCostCentreName + "\t")
@@ -65,12 +75,6 @@ func ReadExcel(path string) error {
 			}
 		}
 	}
-
-	err = file.Close()
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
 	return nil
 }
 
@@ -78,20 +82,20 @@ func readSheets(file *excelize.File) []string {
 	return file.GetSheetList()
 }
 
-func readRows(sheetName string, file *excelize.File) [][]string {
+func readRows(sheetName string, file *excelize.File) ([][]string, error) {
 	rows, err := file.GetRows(sheetName)
 	if err != nil {
-		fmt.Println(err)
+		return nil, fmt.Errorf("failed to read rows: %v", err)
 	}
-	return rows
+	return rows, nil
 }
 
-func readColumns(sheetName string, file *excelize.File) [][]string {
+func readColumns(sheetName string, file *excelize.File) ([][]string, error) {
 	cols, err := file.GetCols(sheetName)
 	if err != nil {
-		fmt.Println(err)
+		return nil, fmt.Errorf("failed to read columns: %v", err)
 	}
-	return cols
+	return cols, nil
 }
 
 func findSecondaryCostCentreIndices(cols [][]string) []int {

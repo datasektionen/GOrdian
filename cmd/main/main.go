@@ -8,5 +8,8 @@ import (
 func main() {
 	fmt.Println("You have very many money")
 	budget := "test/Budget_2024.xlsx"
-	parse.ReadExcel(budget)
+	err := parse.ReadExcel(budget)
+	if err != nil {
+		_ = fmt.Errorf("failed to parse Excel file: %v", err)
+	}
 }

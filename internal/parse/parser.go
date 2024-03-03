@@ -31,23 +31,20 @@ func ReadExcel(path string) {
 		SecondaryCostCentreIndices = findSecondaryCostCentreIndices(cols)
 
 		//iterates over the found secondary cost centres indices
-		for _, secondaryCostCentre := range SecondaryCostCentreIndices {
-			var secondaryCostCentreName = getSecondaryCostCentreByIndex(secondaryCostCentre, cols)
+		for _, secondaryCostCentreIndex := range SecondaryCostCentreIndices {
+			var secondaryCostCentreName = getSecondaryCostCentreByIndex(secondaryCostCentreIndex, cols)
 
 			//loops over the column containing budget lines. Starting one row below the current sec cost centre
-			for colCellIndex, budgetLine := range cols[2][secondaryCostCentre+1:] {
-
+			for colCellIndex, budgetLine := range cols[2][secondaryCostCentreIndex+1:] {
 				if budgetLine == "" {
 					//When encountering an empty cell we have gone through all relevant budget lines
 					fmt.Print("\n")
 					break
 				} else {
-					//Find and print all relevant data
+					account, income, expense, comment := getBudgetLineData(secondaryCostCentreIndex, colCellIndex, cols)
+					//Print all relevant data
+					//We already have sheetname from outmost loop and secondaryCostCentreName from inner loop
 					//0s are gotten without kr for some reason
-					account := cols[3][colCellIndex+secondaryCostCentre+1]
-					income := cols[4][colCellIndex+secondaryCostCentre+1]
-					expense := cols[5][colCellIndex+secondaryCostCentre+1]
-					comment := cols[7][colCellIndex+secondaryCostCentre+1]
 					fmt.Print(sheetName + "\t")
 					fmt.Print(secondaryCostCentreName + "\t")
 					fmt.Print(budgetLine + "\t")
@@ -57,7 +54,6 @@ func ReadExcel(path string) {
 					fmt.Print(comment)
 					fmt.Print("\n")
 				}
-
 			}
 		}
 	}
@@ -109,4 +105,15 @@ func findSecondaryCostCentreIndices(cols [][]string) []int {
 func getSecondaryCostCentreByIndex(secondaryCostCentreIndex int, cols [][]string) string {
 	//Secondary cost centres are always in the second column
 	return cols[1][secondaryCostCentreIndex]
+}
+
+func getBudgetLineData(secondaryCostCentreIndex int, colCellIndex int, cols [][]string) (string, string, string, string) {
+
+	//Find all relevant data
+	//0s are gotten without kr for some reason
+	account := cols[3][colCellIndex+secondaryCostCentreIndex+1]
+	income := cols[4][colCellIndex+secondaryCostCentreIndex+1]
+	expense := cols[5][colCellIndex+secondaryCostCentreIndex+1]
+	comment := cols[7][colCellIndex+secondaryCostCentreIndex+1]
+	return account, income, expense, comment
 }

@@ -98,6 +98,7 @@ func readColumns(sheetName string, file *excelize.File) ([][]string, error) {
 	return cols, err
 }
 
+// findSecondaryCostCentreIndices finds indices of secondary cost centers
 func findSecondaryCostCentreIndices(cols [][]string) []int {
 	var SecondaryCostCentreIndices []int
 	//iterates over cells in the second column, skipping the first row
@@ -111,6 +112,7 @@ func findSecondaryCostCentreIndices(cols [][]string) []int {
 	return SecondaryCostCentreIndices
 }
 
+// getSecondaryCostCentreByIndex retrieves secondary cost center name by index
 func getSecondaryCostCentreByIndex(secondaryCostCentreIndex int, cols [][]string) string {
 	//Secondary cost centres are always in the second column
 	return cols[columnSecondaryCostCentres][secondaryCostCentreIndex]

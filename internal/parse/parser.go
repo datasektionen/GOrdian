@@ -37,13 +37,20 @@ func ReadExcel(path string) {
 
 		fmt.Println(SecondaryCostCentres)
 
-		for _, SecondaryCostCentre := range SecondaryCostCentres {
-			for colCellIndex, colCell := range cols[2][SecondaryCostCentre+1:] {
-				colCellIndex = colCellIndex
-				if colCell == "" {
+		for _, secondaryCostCentre := range SecondaryCostCentres {
+			var secondaryCostCentreName = cols[1][secondaryCostCentre]
+			for colCellIndex, budgetLine := range cols[2][secondaryCostCentre+1:] {
+
+				if budgetLine == "" {
+					fmt.Print("\n")
 					break
 				} else {
-					fmt.Print(sheetName + "\t" + strconv.Itoa(SecondaryCostCentre) + "\t" + colCell + "\t")
+					account := cols[3][colCellIndex+secondaryCostCentre+1]
+					income := cols[4][colCellIndex+secondaryCostCentre+1]
+					expense := cols[5][colCellIndex+secondaryCostCentre+1]
+					comment := cols[6][colCellIndex+secondaryCostCentre+1]
+					comment = comment
+					fmt.Print(sheetName + "\t" + secondaryCostCentreName + "\t" + budgetLine + "\t" + account + "\t" + income + "\t" + expense)
 					fmt.Print("\n")
 				}
 

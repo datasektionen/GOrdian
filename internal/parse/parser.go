@@ -3,7 +3,6 @@ package parse
 import (
 	"fmt"
 	"github.com/xuri/excelize/v2"
-	"log"
 )
 
 const (
@@ -94,7 +93,7 @@ func readRows(sheetName string, file *excelize.File) ([][]string, error) {
 func readColumns(sheetName string, file *excelize.File) ([][]string, error) {
 	cols, err := file.GetCols(sheetName)
 	if err != nil {
-		log.Printf("error closing Excel file: %v", err)
+		return nil, fmt.Errorf("error closing Excel file: %v", err)
 	}
 	return cols, err
 }

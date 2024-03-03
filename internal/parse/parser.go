@@ -25,12 +25,13 @@ func ReadExcel(path string) {
 		rows = rows
 		cols := readColumns(sheetName, file)
 
-		var SecondaryCostCentres []int
+		var SecondaryCostCentreIndices []int
 
-		SecondaryCostCentres = findSecondaryCostCentres(cols)
+		//get indices of all secondary cost centres
+		SecondaryCostCentreIndices = findSecondaryCostCentreIndices(cols)
 
 		//iterates over the found secondary cost centres indices
-		for _, secondaryCostCentre := range SecondaryCostCentres {
+		for _, secondaryCostCentre := range SecondaryCostCentreIndices {
 			var secondaryCostCentreName = getSecondaryCostCentreByIndex(secondaryCostCentre, cols)
 
 			//loops over the column containing budget lines. Starting one row below the current sec cost centre
@@ -92,16 +93,17 @@ func readColumns(sheetName string, file *excelize.File) [][]string {
 	return cols
 }
 
-func findSecondaryCostCentres(cols [][]string) []int {
-	var SecondaryCostCentres []int
+func findSecondaryCostCentreIndices(cols [][]string) []int {
+	var SecondaryCostCentreIndices []int
 	//iterates over cells in the second column, skipping the first row
 	//finds all Secondary cost centres and appends their index to a slice
 	for colCellIndex, colCell := range cols[1][1:] {
 		if colCell != "" {
-			SecondaryCostCentres = append(SecondaryCostCentres, colCellIndex+1)
+			//+1 is needed since 1st row is skipped
+			SecondaryCostCentreIndices = append(SecondaryCostCentreIndices, colCellIndex+1)
 		}
 	}
-	return SecondaryCostCentres
+	return SecondaryCostCentreIndices
 }
 
 func getSecondaryCostCentreByIndex(secondaryCostCentreIndex int, cols [][]string) string {

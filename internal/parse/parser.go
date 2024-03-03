@@ -3,7 +3,6 @@ package parse
 import (
 	"fmt"
 	"github.com/xuri/excelize/v2"
-	"strconv"
 )
 
 func ReadExcel(path string) {
@@ -55,19 +54,6 @@ func ReadExcel(path string) {
 				}
 
 			}
-		}
-
-		for SecondaryCostCentreIndex, SecondaryCostCentre := range SecondaryCostCentres {
-			var budgetLines []string
-			fmt.Println(strconv.Itoa(SecondaryCostCentreIndex) + " " + cols[1][SecondaryCostCentre])
-			for colIndex, col := range cols {
-				if colIndex == 2 {
-					budgetLines = append(budgetLines, col[SecondaryCostCentre+1])
-
-				}
-
-			}
-
 		}
 		fmt.Println()
 	}

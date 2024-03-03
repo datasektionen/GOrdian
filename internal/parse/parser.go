@@ -34,8 +34,6 @@ func ReadExcel(path string) {
 			}
 		}
 
-		fmt.Println(SecondaryCostCentres)
-
 		for _, secondaryCostCentre := range SecondaryCostCentres {
 			var secondaryCostCentreName = cols[1][secondaryCostCentre]
 			for colCellIndex, budgetLine := range cols[2][secondaryCostCentre+1:] {
@@ -55,7 +53,6 @@ func ReadExcel(path string) {
 
 			}
 		}
-		fmt.Println()
 	}
 
 	if err := file.Close(); err != nil {

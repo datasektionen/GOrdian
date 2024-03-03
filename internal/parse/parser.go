@@ -27,13 +27,7 @@ func ReadExcel(path string) {
 
 		var SecondaryCostCentres []int
 
-		//iterates over cells in the second column, skipping the first row
-		//finds all Secondary cost centres and appends their index to a slice
-		for colCellIndex, colCell := range cols[1][1:] {
-			if colCell != "" {
-				SecondaryCostCentres = append(SecondaryCostCentres, colCellIndex+1)
-			}
-		}
+		SecondaryCostCentres = findSecondaryCostCentres(cols)
 
 		//iterates over the found secondary cost centres indices
 		for _, secondaryCostCentre := range SecondaryCostCentres {
@@ -48,6 +42,7 @@ func ReadExcel(path string) {
 					break
 				} else {
 					//Find and print all relevant data
+					//0s are gotten without kr for some reason
 					account := cols[3][colCellIndex+secondaryCostCentre+1]
 					income := cols[4][colCellIndex+secondaryCostCentre+1]
 					expense := cols[5][colCellIndex+secondaryCostCentre+1]
@@ -97,6 +92,19 @@ func readColumns(sheetName string, file *excelize.File) [][]string {
 	return cols
 }
 
+func findSecondaryCostCentres(cols [][]string) []int {
+	var SecondaryCostCentres []int
+	//iterates over cells in the second column, skipping the first row
+	//finds all Secondary cost centres and appends their index to a slice
+	for colCellIndex, colCell := range cols[1][1:] {
+		if colCell != "" {
+			SecondaryCostCentres = append(SecondaryCostCentres, colCellIndex+1)
+		}
+	}
+	return SecondaryCostCentres
+}
+
 func getSecondaryCostCentreByIndex(index int) string {
+
 	return ""
 }

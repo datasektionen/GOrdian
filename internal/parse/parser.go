@@ -107,5 +107,6 @@ func findSecondaryCostCentreIndices(cols [][]string) []int {
 }
 
 func getSecondaryCostCentreByIndex(secondaryCostCentreIndex int, cols [][]string) string {
+	//Secondary cost centres are always in the second column
 	return cols[1][secondaryCostCentreIndex]
 }

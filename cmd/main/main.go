@@ -15,8 +15,13 @@ func main() {
 		log.Printf("error parsing Excel file: %v", err)
 	}
 
-	_, err = database.Connect()
+	db, err := database.Connect()
 	if err != nil {
 		log.Printf("error accessing database: %v", err)
+	}
+
+	err = database.Close(db)
+	if err != nil {
+		log.Printf("error closing database: %v", err)
 	}
 }

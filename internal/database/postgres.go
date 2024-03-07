@@ -19,13 +19,6 @@ func Connect() (*sql.DB, error) {
 		return nil, fmt.Errorf("failed to connect to database: %v", err)
 	}
 
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			_ = fmt.Errorf("error closing connection to database: %v", err)
-		}
-	}(db)
-
 	err = db.Ping()
 	if err != nil {
 		return nil, fmt.Errorf("failed to ping database: %v", err)
@@ -36,6 +29,10 @@ func Connect() (*sql.DB, error) {
 	return db, nil
 }
 
-func Close() error {
+func Close(db *sql.DB) error {
+	err := db.Close()
+	if err != nil {
+		return fmt.Errorf("error closing connection to database: %v", err)
+	}
 	return nil
 }

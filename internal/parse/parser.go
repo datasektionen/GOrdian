@@ -35,11 +35,11 @@ func ReadExcel(path string) error {
 		fmt.Printf("Sheet Name: %s, Index %d\n", sheetName, sheetIndex)
 
 		//read all rows and columns of a sheet
-		rows, err := readRows(sheetName, file)
+		_, err := readRows(sheetName, file)
 		if err != nil {
 			return fmt.Errorf("failed to read rows for sheet %s: %v", sheetName, err)
 		}
-		rows = rows
+
 		cols, err := readColumns(sheetName, file)
 		if err != nil {
 			return fmt.Errorf("failed to read columns for sheet %s: %v", sheetName, err)

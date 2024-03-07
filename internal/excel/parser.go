@@ -6,14 +6,14 @@ import (
 )
 
 type BudgetLine struct {
-	costCentreName          string
-	costCentreType          string
-	secondaryCostCentreName string
-	budgetLineName          string
-	budgetLineAccount       string
-	budgetLineIncome        string
-	budgetLineExpense       string
-	budgetLineComment       string
+	CostCentreName          string
+	CostCentreType          string
+	SecondaryCostCentreName string
+	BudgetLineName          string
+	BudgetLineAccount       string
+	BudgetLineIncome        string
+	BudgetLineExpense       string
+	BudgetLineComment       string
 }
 
 const (
@@ -89,14 +89,14 @@ func ReadExcel(path string) ([]BudgetLine, error) {
 
 					//create BudgetLine object
 					budgetLine := BudgetLine{
-						costCentreName:          costCentreName,
-						costCentreType:          costCentreType,
-						secondaryCostCentreName: secondaryCostCentreName,
-						budgetLineName:          budgetLineName,
-						budgetLineAccount:       budgetLineAccount,
-						budgetLineIncome:        budgetLineIncome,
-						budgetLineExpense:       budgetLineExpense,
-						budgetLineComment:       budgetLineComment,
+						CostCentreName:          costCentreName,
+						CostCentreType:          costCentreType,
+						SecondaryCostCentreName: secondaryCostCentreName,
+						BudgetLineName:          budgetLineName,
+						BudgetLineAccount:       budgetLineAccount,
+						BudgetLineIncome:        budgetLineIncome,
+						BudgetLineExpense:       budgetLineExpense,
+						BudgetLineComment:       budgetLineComment,
 					}
 					//append to budgetLines slice
 					budgetLines = append(budgetLines, budgetLine)

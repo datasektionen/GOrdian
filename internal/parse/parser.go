@@ -12,6 +12,7 @@ const (
 	columnIncome               = 4
 	columnExpense              = 5
 	columnComment              = 7
+	budgetNameCell             = "A2"
 )
 
 func ReadExcel(path string) error {
@@ -44,6 +45,11 @@ func ReadExcel(path string) error {
 			return fmt.Errorf("failed to read columns for sheet %s: %v", sheetName, err)
 		}
 
+		budgetSheetName, err := readCell(file, sheetName, budgetNameCell)
+		if err != nil {
+			return fmt.Errorf("failed to read cell for sheet %s: %v", sheetName, err)
+		}
+
 		//get indices of all secondary cost centres
 		var SecondaryCostCentreIndices []int
 		SecondaryCostCentreIndices = findSecondaryCostCentreIndices(cols)
@@ -63,7 +69,7 @@ func ReadExcel(path string) error {
 					//Print all relevant data
 					//We already have sheetName from outmost loop and secondaryCostCentreName from inner loop
 					//0s are gotten without kr for some reason
-					fmt.Print(sheetName + "\t")
+					fmt.Print(budgetSheetName + "\t")
 					fmt.Print(secondaryCostCentreName + "\t")
 					fmt.Print(budgetLine + "\t")
 					fmt.Print(account + "\t")

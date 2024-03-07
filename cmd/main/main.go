@@ -1,7 +1,8 @@
-package parse2db
+package main
 
 import (
 	"fmt"
+	"github.com/datasektionen/GOrdian/internal/database"
 	"github.com/datasektionen/GOrdian/internal/excel"
 	"log"
 )
@@ -12,5 +13,10 @@ func main() {
 	err := excel.ReadExcel(budget)
 	if err != nil {
 		log.Printf("error parsing Excel file: %v", err)
+	}
+
+	_, err = database.Connect()
+	if err != nil {
+		log.Printf("error accessing database: %v", err)
 	}
 }

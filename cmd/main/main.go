@@ -20,10 +20,16 @@ func main() {
 		log.Printf("error accessing database: %v", err)
 	}
 
+	err = database.InsertBudget(db, budgetLines)
+	if err != nil {
+		log.Printf("error inserting budget in database: %v", err)
+	}
+
 	err = database.Close(db)
 	if err != nil {
 		log.Printf("error closing database: %v", err)
 	}
 
-	fmt.Println(budgetLines)
+	//fmt.Println(budgetLines)
+	//fmt.Println(budgetLines[0].CostCentreName)
 }

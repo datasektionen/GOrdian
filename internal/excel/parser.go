@@ -5,21 +5,33 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
+type BudgetLine struct {
+	costCentreName          string
+	costCentreType          string
+	secondaryCostCentreName string
+	budgetLineName          string
+	budgetLineAccount       string
+	budgetLineIncome        string
+	budgetLineExpense       string
+	budgetLineComment       string
+}
+
 const (
 	columnSecondaryCostCentres = 1
-	columnBudgetLine           = 2
+	columnBudgetLineNames      = 2
 	columnAccount              = 3
 	columnIncome               = 4
 	columnExpense              = 5
 	columnComment              = 7
-	budgetNameCell             = "A2"
+	costCentreNameCell         = "A2"
+	costCentreTypeCell         = "A3"
 )
 
-func ReadExcel(path string) error {
+func ReadExcel(path string) ([]BudgetLine, error) {
 	file, err := excelize.OpenFile(path)
 
 	if err != nil {
-		return fmt.Errorf("failed to open Excel file: %v", err)
+		return nil, fmt.Errorf("failed to open Excel file: %v", err)
 	}
 	defer func() {
 		if err := file.Close(); err != nil {
@@ -29,6 +41,8 @@ func ReadExcel(path string) error {
 
 	sheets := readSheets(file)
 
+	var budgetLines []BudgetLine
+
 	//[1:] excludes the first sheet
 	for sheetIndex, sheetName := range sheets[1:] {
 
@@ -37,17 +51,22 @@ func ReadExcel(path string) error {
 		//read all rows and columns of a sheet
 		_, err := readRows(sheetName, file)
 		if err != nil {
-			return fmt.Errorf("failed to read rows for sheet %s: %v", sheetName, err)
+			return nil, fmt.Errorf("failed to read rows for sheet %s: %v", sheetName, err)
 		}
 
 		cols, err := readColumns(sheetName, file)
 		if err != nil {
-			return fmt.Errorf("failed to read columns for sheet %s: %v", sheetName, err)
+			return nil, fmt.Errorf("failed to read columns for sheet %s: %v", sheetName, err)
 		}
 
-		budgetSheetName, err := readCell(file, sheetName, budgetNameCell)
+		costCentreName, err := readCell(file, sheetName, costCentreNameCell)
 		if err != nil {
-			return fmt.Errorf("failed to read cell for sheet %s: %v", sheetName, err)
+			return nil, fmt.Errorf("failed to read cell for sheet %s: %v", sheetName, err)
+		}
+
+		costCentreType, err := readCell(file, sheetName, costCentreTypeCell)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read cell for sheet %s: %v", sheetName, err)
 		}
 
 		//get indices of all secondary cost centres
@@ -59,29 +78,46 @@ func ReadExcel(path string) error {
 			secondaryCostCentreName := getSecondaryCostCentreByIndex(secondaryCostCentreIndex, cols)
 
 			//loops over the column containing budget lines. Starting one row below the current sec cost centre
-			for colCellIndex, budgetLine := range cols[columnBudgetLine][secondaryCostCentreIndex+1:] {
-				if budgetLine == "" {
+			for colCellIndex, budgetLineName := range cols[columnBudgetLineNames][secondaryCostCentreIndex+1:] {
+				if budgetLineName == "" {
 					//When encountering an empty cell we have gone through all relevant budget lines
 					fmt.Print("\n")
 					break
 				} else {
-					account, income, expense, comment := getBudgetLineData(secondaryCostCentreIndex, colCellIndex, cols)
+					budgetLineAccount, budgetLineIncome, budgetLineExpense, budgetLineComment :=
+						getBudgetLineData(secondaryCostCentreIndex, colCellIndex, cols)
+
+					//create BudgetLine object
+					budgetLine := BudgetLine{
+						costCentreName:          costCentreName,
+						costCentreType:          costCentreType,
+						secondaryCostCentreName: secondaryCostCentreName,
+						budgetLineName:          budgetLineName,
+						budgetLineAccount:       budgetLineAccount,
+						budgetLineIncome:        budgetLineIncome,
+						budgetLineExpense:       budgetLineExpense,
+						budgetLineComment:       budgetLineComment,
+					}
+					//append to budgetLines slice
+					budgetLines = append(budgetLines, budgetLine)
+
 					//Print all relevant data
 					//We already have sheetName from outmost loop and secondaryCostCentreName from inner loop
 					//0s are gotten without kr for some reason
-					fmt.Print(budgetSheetName + "\t")
+					fmt.Print(costCentreName + "\t")
+					fmt.Print(costCentreType + "\t")
 					fmt.Print(secondaryCostCentreName + "\t")
-					fmt.Print(budgetLine + "\t")
-					fmt.Print(account + "\t")
-					fmt.Print(income + "\t")
-					fmt.Print(expense + "\t")
-					fmt.Print(comment)
+					fmt.Print(budgetLineName + "\t")
+					fmt.Print(budgetLineAccount + "\t")
+					fmt.Print(budgetLineIncome + "\t")
+					fmt.Print(budgetLineExpense + "\t")
+					fmt.Print(budgetLineComment)
 					fmt.Print("\n")
 				}
 			}
 		}
 	}
-	return nil
+	return budgetLines, nil
 }
 
 func readCell(file *excelize.File, sheetName string, targetCell string) (string, error) {

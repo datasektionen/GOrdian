@@ -10,7 +10,7 @@ import (
 func main() {
 	fmt.Println("You have very many money")
 	budget := "test/Budget_2024.xlsx"
-	err := excel.ReadExcel(budget)
+	budgetLines, err := excel.ReadExcel(budget)
 	if err != nil {
 		log.Printf("error parsing Excel file: %v", err)
 	}
@@ -24,4 +24,6 @@ func main() {
 	if err != nil {
 		log.Printf("error closing database: %v", err)
 	}
+
+	fmt.Println(budgetLines)
 }

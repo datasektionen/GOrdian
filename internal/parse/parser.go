@@ -78,6 +78,16 @@ func ReadExcel(path string) error {
 	return nil
 }
 
+func readCell(file *excelize.File, sheetName string, targetCell string) (string, error) {
+
+	cellContent, err := file.GetCellValue(sheetName, targetCell)
+
+	if err != nil {
+		return "", fmt.Errorf("failed to read cell: %v", err)
+	}
+	return cellContent, err
+}
+
 func readSheets(file *excelize.File) []string {
 	return file.GetSheetList()
 }

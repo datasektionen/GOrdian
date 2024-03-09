@@ -7,10 +7,27 @@ import (
 	"strings"
 )
 
-type BudgetLine struct {
+type CostCentre struct {
+	CostCentreID   int
+	CostCentreName string
+	CostCentreType string
+}
+
+type SecondaryCostCentre struct {
+	CostCentreID            int
 	CostCentreName          string
 	CostCentreType          string
+	SecondaryCostCentreID   int
 	SecondaryCostCentreName string
+}
+
+type BudgetLine struct {
+	CostCentreID            int
+	CostCentreName          string
+	CostCentreType          string
+	SecondaryCostCentreID   int
+	SecondaryCostCentreName string
+	BudgetLineID            int
 	BudgetLineName          string
 	BudgetLineAccount       string
 	BudgetLineIncome        int
@@ -29,11 +46,11 @@ const (
 	costCentreTypeCell         = "A3"
 )
 
-func ReadExcel(path string) ([]BudgetLine, error) {
+func ReadExcel(path string) ([]CostCentre, []SecondaryCostCentre, []BudgetLine, error) {
 	file, err := excelize.OpenFile(path)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to open Excel file: %v", err)
+		return nil, nil, nil, fmt.Errorf("failed to open Excel file: %v", err)
 	}
 	defer func() {
 		if err := file.Close(); err != nil {
@@ -43,7 +60,12 @@ func ReadExcel(path string) ([]BudgetLine, error) {
 
 	sheets := readSheets(file)
 
+	var costCentres []CostCentre
+	var secondaryCostCentres []SecondaryCostCentre
 	var budgetLines []BudgetLine
+
+	var secondaryCostCentreIDCounter = 0
+	var budgetLineIDCounter = 0
 
 	//[1:] excludes the first sheet
 	for sheetIndex, sheetName := range sheets[1:] {
@@ -53,23 +75,38 @@ func ReadExcel(path string) ([]BudgetLine, error) {
 		//read all rows and columns of a sheet
 		_, err := readRows(sheetName, file)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read rows for sheet %s: %v", sheetName, err)
+			return nil, nil, nil, fmt.Errorf("failed to read rows for sheet %s: %v", sheetName, err)
 		}
 
 		cols, err := readColumns(sheetName, file)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read columns for sheet %s: %v", sheetName, err)
+			return nil, nil, nil, fmt.Errorf("failed to read columns for sheet %s: %v", sheetName, err)
 		}
 
 		costCentreName, err := readCell(file, sheetName, costCentreNameCell)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read cell for sheet %s: %v", sheetName, err)
+			return nil, nil, nil, fmt.Errorf("failed to read cell for sheet %s: %v", sheetName, err)
 		}
 
 		costCentreType, err := readCell(file, sheetName, costCentreTypeCell)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read cell for sheet %s: %v", sheetName, err)
+			return nil, nil, nil, fmt.Errorf("failed to read cell for sheet %s: %v", sheetName, err)
 		}
+
+		convertedCostCentreType, err := convertCostCentreTypeToEnglish(costCentreType)
+		if err != nil {
+			return nil, nil, nil, fmt.Errorf("failed to convert cost centre type \"%s\" to english: %v", costCentreType, err)
+		}
+
+		//Create costCentre object
+		costCentre := CostCentre{
+			CostCentreID:   sheetIndex,
+			CostCentreName: costCentreName,
+			CostCentreType: convertedCostCentreType,
+		}
+
+		//append to costCentres slice
+		costCentres = append(costCentres, costCentre)
 
 		//get indices of all secondary cost centres
 		var SecondaryCostCentreIndices []int
@@ -78,6 +115,18 @@ func ReadExcel(path string) ([]BudgetLine, error) {
 		//iterates over the found secondary cost centres indices
 		for _, secondaryCostCentreIndex := range SecondaryCostCentreIndices {
 			secondaryCostCentreName := getSecondaryCostCentreByIndex(secondaryCostCentreIndex, cols)
+
+			//Create secondaryCostCentre object
+			secondaryCostCentre := SecondaryCostCentre{
+				CostCentreID:            sheetIndex,
+				CostCentreName:          costCentreName,
+				CostCentreType:          convertedCostCentreType,
+				SecondaryCostCentreID:   secondaryCostCentreIDCounter,
+				SecondaryCostCentreName: secondaryCostCentreName,
+			}
+
+			//append to costCentres slice
+			secondaryCostCentres = append(secondaryCostCentres, secondaryCostCentre)
 
 			//loops over the column containing budget lines. Starting one row below the current sec cost centre
 			for colCellIndex, budgetLineName := range cols[columnBudgetLineNames][secondaryCostCentreIndex+1:] {
@@ -91,19 +140,22 @@ func ReadExcel(path string) ([]BudgetLine, error) {
 
 					budgetLineIncome, err := sanitizeBudgetValue(budgetLineIncomeString)
 					if err != nil {
-						return nil, fmt.Errorf("failed to sanitize budget value: %v", err)
+						return nil, nil, nil, fmt.Errorf("failed to sanitize budget value: %v", err)
 					}
 
 					budgetLineExpense, err := sanitizeBudgetValue(budgetLineExpenseString)
 					if err != nil {
-						return nil, fmt.Errorf("failed to sanitize budget value: %v", err)
+						return nil, nil, nil, fmt.Errorf("failed to sanitize budget value: %v", err)
 					}
 
 					//create BudgetLine object
 					budgetLine := BudgetLine{
+						CostCentreID:            sheetIndex,
 						CostCentreName:          costCentreName,
-						CostCentreType:          costCentreType,
+						CostCentreType:          convertedCostCentreType,
+						SecondaryCostCentreID:   secondaryCostCentreIDCounter,
 						SecondaryCostCentreName: secondaryCostCentreName,
+						BudgetLineID:            budgetLineIDCounter,
 						BudgetLineName:          budgetLineName,
 						BudgetLineAccount:       budgetLineAccount,
 						BudgetLineIncome:        budgetLineIncome,
@@ -116,20 +168,26 @@ func ReadExcel(path string) ([]BudgetLine, error) {
 					//Print all relevant data
 					//We already have sheetName from outmost loop and secondaryCostCentreName from inner loop
 					//0s are gotten without kr for some reason
-					fmt.Print(costCentreName + "\t")
-					fmt.Print(costCentreType + "\t")
+					fmt.Print(strconv.Itoa(sheetIndex) + " ")
+					fmt.Print(costCentreName + " ")
+					fmt.Print(convertedCostCentreType + "\t")
+					fmt.Print(strconv.Itoa(secondaryCostCentreIDCounter) + " ")
 					fmt.Print(secondaryCostCentreName + "\t")
-					fmt.Print(budgetLineName + "\t")
+					fmt.Print(strconv.Itoa(budgetLineIDCounter) + " ")
+					fmt.Print(budgetLineName + " ")
 					fmt.Print(budgetLineAccount + "\t")
-					fmt.Print(strconv.Itoa(budgetLineIncome) + "\t")
+					fmt.Print(strconv.Itoa(budgetLineIncome) + " ")
 					fmt.Print(strconv.Itoa(budgetLineExpense) + "\t")
 					fmt.Print(budgetLineComment)
 					fmt.Print("\n")
+
+					budgetLineIDCounter++
 				}
 			}
+			secondaryCostCentreIDCounter++
 		}
 	}
-	return budgetLines, nil
+	return costCentres, secondaryCostCentres, budgetLines, nil
 }
 
 func readCell(file *excelize.File, sheetName string, targetCell string) (string, error) {
@@ -191,6 +249,19 @@ func getBudgetLineData(secondaryCostCentreIndex int, colCellIndex int, cols [][]
 	expense := cols[columnExpense][colCellIndex+secondaryCostCentreIndex+1]
 	comment := cols[columnComment][colCellIndex+secondaryCostCentreIndex+1]
 	return account, income, expense, comment
+}
+
+func convertCostCentreTypeToEnglish(costCentreType string) (string, error) {
+	switch strings.ToLower(costCentreType) {
+	case "nämnd":
+		return "committee", nil
+	case "projekt":
+		return "project", nil
+	case "övrigt":
+		return "other", nil
+	default:
+		return "", fmt.Errorf("invalid cost centre type: %s", costCentreType)
+	}
 }
 
 func sanitizeBudgetValue(valueString string) (int, error) {

@@ -10,7 +10,7 @@ import (
 func main() {
 	fmt.Println("You have very many money")
 	budget := "test/Budget_2024.xlsx"
-	budgetLines, err := excel.ReadExcel(budget)
+	costCentres, secondaryCostCentres, budgetLines, err := excel.ReadExcel(budget)
 	if err != nil {
 		log.Printf("error parsing Excel file: %v", err)
 	}
@@ -25,9 +25,19 @@ func main() {
 		log.Printf("error inserting budget in database: %v", err)
 	}
 
-	err = database.InsertBudget(db, budgetLines)
+	err = database.InsertCostCentres(db, costCentres)
 	if err != nil {
-		log.Printf("error inserting budget in database: %v", err)
+		log.Printf("error inserting cost centres in database: %v", err)
+	}
+
+	err = database.InsertSecondaryCostCentres(db, secondaryCostCentres)
+	if err != nil {
+		log.Printf("error inserting secondary cost centres in database: %v", err)
+	}
+
+	err = database.InsertBudgetLines(db, budgetLines)
+	if err != nil {
+		log.Printf("error inserting budget lines in database: %v", err)
 	}
 
 	err = database.Close(db)

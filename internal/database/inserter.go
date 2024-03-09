@@ -7,14 +7,42 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// TODO sanitize integer values in parser
-func InsertBudget(db *sql.DB, budgetLines []excel.BudgetLine) error {
-	var insertStatementDyn = `insert into "budget_lines"("id", "name", "income", "expenses", "comment", "account", "secondary_cost_centre_id") values($1, $2, $3, $4, $5, $6, $7)`
-	fmt.Println(insertStatementDyn)
-	_, err := db.Exec(insertStatementDyn, 1, budgetLines[0].BudgetLineName, 6, 9, budgetLines[0].BudgetLineComment, budgetLines[0].BudgetLineAccount, 1)
-	if err != nil {
-		return fmt.Errorf("failed to insert to database: %v", err)
+func InsertCostCentres(db *sql.DB, costCentres []excel.CostCentre) error {
+	var costCentresInsertStatementDynamic = `INSERT INTO "cost_centres"("id", "name", "type") values($1, $2, $3)`
+	fmt.Println(costCentresInsertStatementDynamic)
+	for _, costCentre := range costCentres {
+		_, err := db.Exec(costCentresInsertStatementDynamic, costCentre.CostCentreID, costCentre.CostCentreName, costCentre.CostCentreType)
+		if err != nil {
+			return fmt.Errorf("failed to insert cost centre in database: %v", err)
+		}
 	}
+	fmt.Println(costCentres[0])
+	return nil
+}
+
+func InsertSecondaryCostCentres(db *sql.DB, secondaryCostCentres []excel.SecondaryCostCentre) error {
+	var secondaryCostCentresInsertStatementDynamic = `INSERT INTO "secondary_cost_centres"("id", "name", "cost_centre_id") values($1, $2, $3)`
+	fmt.Println(secondaryCostCentresInsertStatementDynamic)
+	for _, secondaryCostCentre := range secondaryCostCentres {
+		_, err := db.Exec(secondaryCostCentresInsertStatementDynamic, secondaryCostCentre.SecondaryCostCentreID, secondaryCostCentre.SecondaryCostCentreName, secondaryCostCentre.CostCentreID)
+		if err != nil {
+			return fmt.Errorf("failed to insert secondary cost centre in database: %v", err)
+		}
+	}
+	fmt.Println(secondaryCostCentres[0])
+	return nil
+}
+
+func InsertBudgetLines(db *sql.DB, budgetLines []excel.BudgetLine) error {
+	var insertBudgetLinesStatementDynamic = `INSERT INTO "budget_lines"("id", "name", "income", "expenses", "comment", "account", "secondary_cost_centre_id") values($1, $2, $3, $4, $5, $6, $7)`
+	fmt.Println(insertBudgetLinesStatementDynamic)
+	for _, budgetLine := range budgetLines {
+		_, err := db.Exec(insertBudgetLinesStatementDynamic, budgetLine.BudgetLineID, budgetLine.BudgetLineName, budgetLine.BudgetLineIncome, budgetLine.BudgetLineExpense, budgetLine.BudgetLineComment, budgetLine.BudgetLineAccount, budgetLine.SecondaryCostCentreID)
+		if err != nil {
+			return fmt.Errorf("failed to insert budget line in database: %v", err)
+		}
+	}
+	fmt.Println(budgetLines[0])
 	return nil
 }
 

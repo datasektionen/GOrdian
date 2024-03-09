@@ -20,6 +20,11 @@ func main() {
 		log.Printf("error accessing database: %v", err)
 	}
 
+	err = database.WipeDatabase(db)
+	if err != nil {
+		log.Printf("error inserting budget in database: %v", err)
+	}
+
 	err = database.InsertBudget(db, budgetLines)
 	if err != nil {
 		log.Printf("error inserting budget in database: %v", err)
@@ -27,7 +32,7 @@ func main() {
 
 	err = database.Close(db)
 	if err != nil {
-		log.Printf("error closing database: %v", err)
+		log.Printf("error wiping database: %v", err)
 	}
 
 	//fmt.Println(budgetLines)

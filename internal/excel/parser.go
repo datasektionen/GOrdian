@@ -3,6 +3,8 @@ package excel
 import (
 	"fmt"
 	"github.com/xuri/excelize/v2"
+	"strconv"
+	"strings"
 )
 
 type BudgetLine struct {
@@ -11,8 +13,8 @@ type BudgetLine struct {
 	SecondaryCostCentreName string
 	BudgetLineName          string
 	BudgetLineAccount       string
-	BudgetLineIncome        string
-	BudgetLineExpense       string
+	BudgetLineIncome        int
+	BudgetLineExpense       int
 	BudgetLineComment       string
 }
 
@@ -84,8 +86,18 @@ func ReadExcel(path string) ([]BudgetLine, error) {
 					fmt.Print("\n")
 					break
 				} else {
-					budgetLineAccount, budgetLineIncome, budgetLineExpense, budgetLineComment :=
+					budgetLineAccount, budgetLineIncomeString, budgetLineExpenseString, budgetLineComment :=
 						getBudgetLineData(secondaryCostCentreIndex, colCellIndex, cols)
+
+					budgetLineIncome, err := sanitizeBudgetValue(budgetLineIncomeString)
+					if err != nil {
+						return nil, fmt.Errorf("failed to sanitize budget value: %v", err)
+					}
+
+					budgetLineExpense, err := sanitizeBudgetValue(budgetLineExpenseString)
+					if err != nil {
+						return nil, fmt.Errorf("failed to sanitize budget value: %v", err)
+					}
 
 					//create BudgetLine object
 					budgetLine := BudgetLine{
@@ -109,8 +121,8 @@ func ReadExcel(path string) ([]BudgetLine, error) {
 					fmt.Print(secondaryCostCentreName + "\t")
 					fmt.Print(budgetLineName + "\t")
 					fmt.Print(budgetLineAccount + "\t")
-					fmt.Print(budgetLineIncome + "\t")
-					fmt.Print(budgetLineExpense + "\t")
+					fmt.Print(strconv.Itoa(budgetLineIncome) + "\t")
+					fmt.Print(strconv.Itoa(budgetLineExpense) + "\t")
 					fmt.Print(budgetLineComment)
 					fmt.Print("\n")
 				}
@@ -179,4 +191,31 @@ func getBudgetLineData(secondaryCostCentreIndex int, colCellIndex int, cols [][]
 	expense := cols[columnExpense][colCellIndex+secondaryCostCentreIndex+1]
 	comment := cols[columnComment][colCellIndex+secondaryCostCentreIndex+1]
 	return account, income, expense, comment
+}
+
+func sanitizeBudgetValue(valueString string) (int, error) {
+	// 0
+	// -72,500 kr
+	// 200,000 kr
+	// -3,600.00 kr
+	// 10,000.00 kr
+
+	valueStringSanitized := strings.ReplaceAll(valueString, " ", "")
+	valueStringSanitized = strings.ReplaceAll(valueStringSanitized, ",", "")
+	valueStringSanitized = strings.ReplaceAll(valueStringSanitized, "kr", "")
+
+	if strings.Contains(valueStringSanitized, ".") {
+		return 0, fmt.Errorf("failed to convert budget string \"%s\" to int: string contains \".\", check decimal places of incomes and expenses", valueString)
+	}
+
+	if valueStringSanitized == "" {
+		return 0, fmt.Errorf("failed to convert budget string \"%s\" to int: budget value is empty, check incomes and expenses for zero-values", valueString)
+	}
+
+	valueInt, err := strconv.Atoi(valueStringSanitized)
+	if err != nil {
+		return 0, fmt.Errorf("failed to convert budget string \"%s\" to int: %v", valueString, err)
+	}
+
+	return valueInt, nil
 }

@@ -8,5 +8,11 @@
 </head>
 <body>
     <h1>{{ .motd }}</h1>
+    <h1> Nämnder </h1>
+    {{range $_,$committee:= .committees}} <h2> {{$committee.CostCentreName}} </h2>{{end}}
+    <h1> Projekt </h1>
+    {{range $_,$project:= .projects}} <h2> {{$project.CostCentreName}} </h2>{{end}}
+    <h1> Övrigt </h1>
+    {{range $_,$other:= .others}} <h2> {{$other.CostCentreName}} </h2>{{end}}
 </body>
 </html>

@@ -13,6 +13,9 @@ import (
 //go:embed templates/*.html
 var templatesFS embed.FS
 
+//go:embed static/*
+var staticFiles embed.FS
+
 var templates *template.Template
 
 func Mount(mux *http.ServeMux, db *sql.DB) error {
@@ -21,7 +24,7 @@ func Mount(mux *http.ServeMux, db *sql.DB) error {
 	if err != nil {
 		return err
 	}
-
+	mux.Handle("/", http.FileServerFS(staticFiles))
 	mux.Handle("/{$}", page(db, index))
 
 	return nil

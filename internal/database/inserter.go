@@ -34,7 +34,7 @@ func InsertSecondaryCostCentres(db *sql.DB, secondaryCostCentres []excel.Seconda
 }
 
 func InsertBudgetLines(db *sql.DB, budgetLines []excel.BudgetLine) error {
-	var insertBudgetLinesStatementDynamic = `INSERT INTO "budget_lines"("id", "name", "income", "expenses", "comment", "account", "secondary_cost_centre_id") values($1, $2, $3, $4, $5, $6, $7)`
+	var insertBudgetLinesStatementDynamic = `INSERT INTO "budget_lines"("id", "name", "income", "expense", "comment", "account", "secondary_cost_centre_id") values($1, $2, $3, $4, $5, $6, $7)`
 	fmt.Println(insertBudgetLinesStatementDynamic)
 	for _, budgetLine := range budgetLines {
 		_, err := db.Exec(insertBudgetLinesStatementDynamic, budgetLine.BudgetLineID, budgetLine.BudgetLineName, budgetLine.BudgetLineIncome, budgetLine.BudgetLineExpense, budgetLine.BudgetLineComment, budgetLine.BudgetLineAccount, budgetLine.SecondaryCostCentreID)

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/static/main.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOrdian</title>
+</head>
+<body>
+    <h1>{{.costCentre.CostCentreName}}</h1>
+    {{range $_, $secondaryCostCentresWithBudgetLines := .secondaryCostCentresWithBudgetLinesList}}
+        <h1> {{$secondaryCostCentresWithBudgetLines.SecondaryCostCentreName}} </h1>
+        {{range $_, $budgetLines := $secondaryCostCentresWithBudgetLines.BudgetLines}}
+            <h2> {{$budgetLines.BudgetLineName}} {{$budgetLines.BudgetLineIncome}} {{$budgetLines.BudgetLineExpense}}</h2>
+        {{end}}
+    {{end}}
+</body>
+</html>

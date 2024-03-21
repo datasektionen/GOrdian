@@ -2,7 +2,7 @@ CREATE TABLE budget_lines (
     id integer NOT NULL,
     name TEXT NOT NULL,
     income integer NOT NULL,
-    expenses integer NOT NULL,
+    expense integer NOT NULL,
 	comment TEXT,
 	account TEXT,
     secondary_cost_centre_id integer NOT NULL,

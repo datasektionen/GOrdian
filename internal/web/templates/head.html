@@ -1,0 +1,31 @@
+<head>
+    <link rel="stylesheet" href="/static/main.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOrdian</title>
+    <script>
+        window.methone_conf = {
+        system_name: "GOrdian",
+        color_scheme: "teal",
+        login_text: "Login", // Default null, null hides button
+        login_href: "/login",
+        links: [
+          {
+          str: "Hem",
+          href: "/",
+          },
+        ]
+        }
+      </script>
+      <script async src="//methone.datasektionen.se/bar.js"></script>
+      <script>
+        // The config can be updated dynamically!
+        window.methone_conf.update({
+        login_text: "Log out", 
+        login_href: "/logout"
+        })
+        // Only the provided keys will be updated.
+      </script>
+</head>
+

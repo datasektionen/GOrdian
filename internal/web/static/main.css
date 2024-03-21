@@ -1,3 +1,20 @@
-h2 {
+h1 {
+    text-align: center;
+}
+
+#costCentreNames {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+#costCentreNames a {
+    text-align: center;
     color:green;
+    display: block;
+}
+
+#costCentreNames >div {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
 }

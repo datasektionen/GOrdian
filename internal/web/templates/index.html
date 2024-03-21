@@ -9,11 +9,19 @@
 </head>
 <body>
     <h1>{{ .motd }}</h1>
-    <h1> Nämnder </h1>
-    {{range $_,$committee:= .committees}} <h2> {{$committee.CostCentreName}} </h2>{{end}}
-    <h1> Projekt </h1>
-    {{range $_,$project:= .projects}} <h2> {{$project.CostCentreName}} </h2>{{end}}
-    <h1> Övrigt </h1>
-    {{range $_,$other:= .others}} <h2> {{$other.CostCentreName}} </h2>{{end}}
+    <div id="costCentreNames">
+        <div>
+            <h1> Nämnder </h1>
+            {{range $_,$committee:= .committees}} <a href="/costcentre/{{$committee.CostCentreID}}"> {{$committee.CostCentreName}} </a>{{end}}
+        </div>
+        <div>
+            <h1> Projekt </h1>
+            {{range $_,$project:= .projects}} <a href="/costcentre/{{$project.CostCentreID}}"> {{$project.CostCentreName}} </a>{{end}}
+        </div>
+        <div>
+            <h1> Övrigt </h1>
+            {{range $_,$other:= .others}} <a href="/costcentre/{{$other.CostCentreID}}"> {{$other.CostCentreName}} </a>{{end}}
+        </div>
+    </div>
 </body>
 </html>

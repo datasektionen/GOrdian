@@ -24,7 +24,7 @@ func Mount(mux *http.ServeMux, db *sql.DB) error {
 	if err != nil {
 		return err
 	}
-	mux.Handle("/", http.FileServerFS(staticFiles))
+	mux.Handle("/static/", http.FileServerFS(staticFiles))
 	mux.Handle("/{$}", page(db, index))
 
 	return nil

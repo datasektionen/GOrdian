@@ -25,3 +25,40 @@ h1 {
     align-items: center;
     flex-direction: column;
 }
+
+#costCentre h1 {
+    padding-top: 2em;
+    text-align: center;
+}
+#costCentre >div {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+#costCentre table {
+    width: 80%;
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+#costCentre table th {
+    background-color: rgb(197, 197, 197);
+    text-align: left;
+}
+
+#costCentre table td {
+    text-align: left;
+}
+
+#costCentreNum table td {
+    text-align: right;
+}
+
+#costCentre tbody tr:hover {
+    font-weight: bold;
+}
+
+#costCentre table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}

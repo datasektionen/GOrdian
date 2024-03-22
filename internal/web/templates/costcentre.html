@@ -3,15 +3,29 @@
 {{template "head.html"}}
 <body>
 <div id="methone-container-replace"></div>
-    <nav>This will be replaced</nav>
 </div>
+<div id="costCentre">
     <h1>{{.costCentre.CostCentreName}}</h1>
-    {{range $_, $secondaryCostCentresWithBudgetLines := .secondaryCostCentresWithBudgetLinesList}}
-        <h1> {{$secondaryCostCentresWithBudgetLines.SecondaryCostCentreName}} </h1>
-        {{range $_, $budgetLines := $secondaryCostCentresWithBudgetLines.BudgetLines}}
-            <h2> {{$budgetLines.BudgetLineName}} {{$budgetLines.BudgetLineIncome}} {{$budgetLines.BudgetLineExpense}}</h2>
+    <table id="costCentre">
+        <th></th>
+            <th>Intäkter</th>
+            <th>Utgifter</th>
+        {{range $_, $secondaryCostCentresWithBudgetLines := .secondaryCostCentresWithBudgetLinesList}}
+        <tr style="background-color: rgb(73, 73, 73);">
+            <th>{{$secondaryCostCentresWithBudgetLines.SecondaryCostCentreName}}</th>
+            <th>Intäkter</th>
+            <th>Utgifter</th>
+        </tr>
+            {{range $_, $budgetLines := $secondaryCostCentresWithBudgetLines.BudgetLines}}
+            <tr>
+                <td>{{$budgetLines.BudgetLineName}}</td>
+                <td id="costCentreNum">{{$budgetLines.BudgetLineIncome}}</td>
+                <td id="costCentreNum">{{$budgetLines.BudgetLineExpense}}</td>
+            </tr>
         {{end}}
-    {{end}}
+        {{end}}
+</table>
+    </div>
 </body>
 </html>
 

@@ -21,8 +21,14 @@ h1 {
 }
 
 #costCentreNames ul {
+    text-align: left;
     list-style-type: none;
     line-height: 1.6;
+}
+
+#costCentreNames ul li {
+    text-align: left;
+    justify-content: left;
 }
 
 
@@ -45,7 +51,7 @@ h1 {
 #costCentre table {
     width: 100%;
     border-collapse: collapse;
-    margin: auto;
+    margin-top: 5px;
     padding: 2em;
     transition: none;
     white-space: nowrap;
@@ -63,7 +69,7 @@ h1 {
 #costCentre table td {
     text-align: left;
     padding: 5px;
-    font-size: 11pt;
+    font-size: 12pt;
     transition: none;
     border-bottom: 1px solid #d6d9db;
     white-space: nowrap;
@@ -71,16 +77,17 @@ h1 {
 
 #costCentre tbody tr:hover {
     transition: none; /* Jävla Aurora */
-    font-weight: bold;
+    background-color: rgb(220, 220, 220) !important;
+}
+
+#costCentre table tr:nth-child(even) {
+    background-color: #f2f2f2;
 }
 
 #costCentre tbody tr{
     transition: none; /* Jävla Aurora */
 }
 
-#costCentre table tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
 
 @media screen and (max-width: 600px) {
     .hide-on-mobile {

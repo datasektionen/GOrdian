@@ -1,9 +1,4 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,300,700,400italic,700italic,900);
-@import url(https://use.fontawesome.com/releases/v6.4.2/css/all.css);
-body {
-    font-family: Lato;
-    margin: 0;
-}
 
 h1 {
     text-align: center;
@@ -42,17 +37,18 @@ h1 {
     text-align: center;
 }
 #costCentre div {
-    width: 100%;
     display: flex;
     align-items: center;
     flex-direction: column;
 }
 
 #costCentre table {
-    width: 80%;
+    width: 100%;
     border-collapse: collapse;
     margin: auto;
     padding: 2em;
+    transition: none;
+    white-space: nowrap;
 }
 
 #costCentre table th {
@@ -60,22 +56,41 @@ h1 {
     width: 3em;
     padding: 8px;
     font-size: 13pt;
+    transition: none;
+    white-space: nowrap;
 }
 
 #costCentre table td {
     text-align: left;
     padding: 5px;
     font-size: 11pt;
-}
-
-#costCentreNum table td {
-    text-align: right;
+    transition: none;
+    border-bottom: 1px solid #d6d9db;
+    white-space: nowrap;
 }
 
 #costCentre tbody tr:hover {
+    transition: none; /* Jävla Aurora */
     font-weight: bold;
+}
+
+#costCentre tbody tr{
+    transition: none; /* Jävla Aurora */
 }
 
 #costCentre table tr:nth-child(even) {
     background-color: #f2f2f2;
+}
+
+@media screen and (max-width: 600px) {
+    .hide-on-mobile {
+        display: none;
+    }
+    
+}
+
+@media screen and (max-width: 900px) {
+    .hide-on-half-desktop {
+        display: none;
+    }
 }

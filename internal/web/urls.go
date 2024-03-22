@@ -102,13 +102,33 @@ func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 		return fmt.Errorf("failed calculate secondary cost centre values: %v", err)
 	}
 
+	costCentreTotalIncome, costCentreTotalExpense, costCentreTotalResult, err := calculateCostCentre(secondaryCostCentresWithBudgetLinesList)
+	if err != nil {
+		return fmt.Errorf("failed calculate cost centre values: %v", err)
+	}
+
 	if err := templates.ExecuteTemplate(w, "costcentre.html", map[string]any{
 		"secondaryCostCentresWithBudgetLinesList": secondaryCostCentresWithBudgetLinesList,
-		"costCentre": costCentre,
+		"costCentre":             costCentre,
+		"costCentreTotalIncome":  costCentreTotalIncome,
+		"costCentreTotalExpense": costCentreTotalExpense,
+		"costCentreTotalResult":  costCentreTotalResult,
 	}); err != nil {
 		return fmt.Errorf("could not render template: %w", err)
 	}
 	return nil
+}
+
+func calculateCostCentre(secondaryCostCentresWithBudgetLinesList []secondaryCostCentresWithBudgetLines) (int, int, int, error) {
+	var totalIncome int
+	var totalExpense int
+	for _, sCCWithBudgetLines := range secondaryCostCentresWithBudgetLinesList {
+		totalIncome = totalIncome + sCCWithBudgetLines.SecondaryCostCentreTotalIncome
+		totalExpense = totalExpense + sCCWithBudgetLines.SecondaryCostCentreTotalExpense
+	}
+	totalResult := totalIncome + totalExpense
+
+	return totalIncome, totalExpense, totalResult, nil
 }
 
 func calculateSecondaryCostCentres(secondaryCostCentresWithBudgetLinesList []secondaryCostCentresWithBudgetLines) ([]secondaryCostCentresWithBudgetLines, error) {

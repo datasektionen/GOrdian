@@ -27,7 +27,7 @@ func Mount(mux *http.ServeMux, db *sql.DB) error {
 		return err
 	}
 	mux.Handle("/static/", http.FileServerFS(staticFiles))
-	mux.Handle("/{$}", page(db, index))
+	mux.Handle("/{$}", page(db, indexPage))
 	mux.Handle("/costcentre/{costCentreIDPath}", page(db, costCentrePage))
 
 	return nil
@@ -44,7 +44,7 @@ func page(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, db *s
 	})
 }
 
-func index(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	costCentres, err := getCostCentres(db)
 	if err != nil {
 		return fmt.Errorf("failed get scan cost centre information from database: %v", err)
@@ -96,6 +96,11 @@ func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 		return fmt.Errorf("failed get scan cost centre information from database: %v", err)
 	}
 
+	secondaryCostCentresWithBudgetLinesList, err = calculateSecondaryCostCentre(secondaryCostCentresWithBudgetLinesList)
+	if err != nil {
+		return fmt.Errorf("failed calculate secondary cost centre values: %v", err)
+	}
+
 	if err := templates.ExecuteTemplate(w, "costcentre.html", map[string]any{
 		"secondaryCostCentresWithBudgetLinesList": secondaryCostCentresWithBudgetLinesList,
 		"costCentre": costCentre,
@@ -105,9 +110,28 @@ func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	return nil
 }
 
+func calculateSecondaryCostCentre(secondaryCostCentresWithBudgetLinesList []secondaryCostCentresWithBudgetLines) ([]secondaryCostCentresWithBudgetLines, error) {
+	for index, sCCWithBudgetLines := range secondaryCostCentresWithBudgetLinesList {
+		var totalIncome int
+		var totalExpense int
+		for _, budgetLine := range sCCWithBudgetLines.BudgetLines {
+			totalIncome = totalIncome + budgetLine.BudgetLineIncome
+			totalExpense = totalExpense + budgetLine.BudgetLineExpense
+		}
+		secondaryCostCentresWithBudgetLinesList[index].SecondaryCostCentreTotalIncome = totalIncome
+		secondaryCostCentresWithBudgetLinesList[index].SecondaryCostCentreTotalExpense = totalExpense
+		secondaryCostCentresWithBudgetLinesList[index].SecondaryCostCentreTotalResult = totalIncome + totalExpense
+	}
+	fmt.Println(secondaryCostCentresWithBudgetLinesList)
+	return secondaryCostCentresWithBudgetLinesList, nil
+}
+
 type secondaryCostCentresWithBudgetLines struct {
-	SecondaryCostCentreName string
-	BudgetLines             []excel.BudgetLine
+	SecondaryCostCentreName         string
+	SecondaryCostCentreTotalIncome  int
+	SecondaryCostCentreTotalExpense int
+	SecondaryCostCentreTotalResult  int
+	BudgetLines                     []excel.BudgetLine
 }
 
 func getBudgetLines(db *sql.DB, costCentreID int) ([]excel.BudgetLine, error) {

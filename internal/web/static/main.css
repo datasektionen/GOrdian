@@ -2,6 +2,7 @@
 @import url(https://use.fontawesome.com/releases/v6.4.2/css/all.css);
 body {
     font-family: Lato;
+    margin: 0;
 }
 
 h1 {
@@ -41,6 +42,7 @@ h1 {
     text-align: center;
 }
 #costCentre div {
+    width: 100%;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -54,12 +56,16 @@ h1 {
 }
 
 #costCentre table th {
-    background-color: rgb(197, 197, 197);
     text-align: left;
+    width: 3em;
+    padding: 8px;
+    font-size: 13pt;
 }
 
 #costCentre table td {
     text-align: left;
+    padding: 5px;
+    font-size: 11pt;
 }
 
 #costCentreNum table td {
@@ -72,12 +78,4 @@ h1 {
 
 #costCentre table tr:nth-child(even) {
     background-color: #f2f2f2;
-}
-
-#costCentrePos table td{
-    color: green;
-}
-
-.costCentreNegative td{
-    color: red;
 }

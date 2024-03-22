@@ -1,52 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 {{template "head.html"}}
+
 <body>
     <div id="methone-container-replace"></div>
     <div id="costCentre">
-        <h1>{{.costCentre.CostCentreName}}</h1>
-        <table>
-            <tr>
-                <th></th>
-                <th>Intäkter</th>
-                <th>Utgifter</th>
-                <th>Resultat</th>
-            </tr>
-            <tr>
-                <th>{{.costCentre.CostCentreName}}</th>
-                <th style="color: {{if gt .costCentreTotalIncome 0}} green {{else if lt .costCentreTotalIncome 0}} red {{else}} black{{end}};">{{.costCentreTotalIncome}} kr</th>
-                <th style="color: {{if gt .costCentreTotalExpense 0}} green {{else if lt .costCentreTotalExpense 0}} red {{else}} black{{end}};">{{.costCentreTotalExpense}} kr</th>
-                <th style="color: {{if gt .costCentreTotalResult 0}} green {{else if lt .costCentreTotalResult 0}} red {{else}} black{{end}};">{{.costCentreTotalResult}} kr</th>
-            </tr>
-        </table>
-    </div>
-    <br/>
+        <div style="width: 100%; background-color: #78909C; color: white;">
+            <h1>Budget: {{.costCentre.CostCentreName}}</h1>
+        </div>
+    
+        <br/>
     <div id="costCentre">
         <table>
-            <tr>
-                <th></th>
+            <tr style="background-color: rgb(176,190,197);">
+                <th style="font-size: 20pt;">{{.costCentre.CostCentreName}}</th>
+                <th>Bokföringskonto</th>
                 <th>Intäkter</th>
                 <th>Utgifter</th>
                 <th>Resultat</th>
             </tr>
-            {{range $_, $secondaryCostCentresWithBudgetLines := .secondaryCostCentresWithBudgetLinesList}}
-            <tr style="background-color: rgb(73, 73, 73);">
-                <th>{{$secondaryCostCentresWithBudgetLines.SecondaryCostCentreName}}</th>
-                <th style="color: {{if gt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalIncome 0}} green {{else if lt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalIncome 0}} red {{else}} black{{end}};">{{$secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalIncome}} kr</th>
-                <th style="color: {{if gt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalExpense 0}} green {{else if lt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalExpense 0}} red {{else}} black{{end}};">{{$secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalExpense}} kr</th>
-                <th style="color: {{if gt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalResult 0}} green {{else if lt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalResult 0}} red {{else}} black{{end}};">{{$secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalResult}} kr</th>
+            <tr style="background-color: rgb(176,190,197);">
+                <th>Totalt</th>
+                <th></th>
+                <th
+                    style="color: {{if gt .costCentreTotalIncome 0}} #4CAF50 {{else if lt .costCentreTotalIncome 0}} #E57373 {{else}} black{{end}};">
+                    {{formatMoney .costCentreTotalIncome}} kr
+                </th>
+                <th
+                    style="color: {{if gt .costCentreTotalExpense 0}} #4CAF50 {{else if lt .costCentreTotalExpense 0}} #E57373 {{else}} black{{end}};">
+                    {{formatMoney .costCentreTotalExpense}} kr
+                </th>
+                <th
+                    style="color: {{if gt .costCentreTotalResult 0}} #4CAF50 {{else if lt .costCentreTotalResult 0}} #E57373 {{else}} black{{end}};">
+                    {{formatMoney .costCentreTotalResult}} kr
+                </th>
             </tr>
-                {{range $_, $budgetLines := $secondaryCostCentresWithBudgetLines.BudgetLines}}
-                <tr>
-                    <td>{{$budgetLines.BudgetLineName}}</td>
-                    <td style="color: {{if gt $budgetLines.BudgetLineIncome 0}} green {{else if lt $budgetLines.BudgetLineIncome 0}} red {{else}} black{{end}};">{{$budgetLines.BudgetLineIncome}} kr</td>
-                    <td style="color: {{if gt $budgetLines.BudgetLineExpense 0}} green {{else if lt $budgetLines.BudgetLineExpense 0}} red {{else}} black{{end}};">{{$budgetLines.BudgetLineExpense}} kr</td>
-                    <td></td>
-                </tr>
+            <tr style="height: 1em;">
+            </tr>
+            {{range $_, $secondaryCostCentresWithBudgetLines := .secondaryCostCentresWithBudgetLinesList}}
+            <tr style="background-color: rgb(207,216,220);">
+                <th>{{$secondaryCostCentresWithBudgetLines.SecondaryCostCentreName}}</th>
+                <th></th>
+                <th
+                    style="color: {{if gt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalIncome 0}} #4CAF50 {{else if lt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalIncome 0}} #E57373 {{else}} black{{end}};">
+                    {{formatMoney $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalIncome}} kr</th>
+                <th
+                    style="color: {{if gt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalExpense 0}} #4CAF50 {{else if lt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalExpense 0}} #E57373 {{else}} black{{end}};">
+                    {{formatMoney $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalExpense}} kr</th>
+                <th
+                    style="color: {{if gt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalResult 0}} #4CAF50 {{else if lt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalResult 0}} #E57373 {{else}} black{{end}};">
+                    {{formatMoney $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalResult}} kr</th>
+            </tr>
+            {{range $_, $budgetLines := $secondaryCostCentresWithBudgetLines.BudgetLines}}
+            <tr>
+                <td>{{$budgetLines.BudgetLineName}}</td>
+                <td>{{$budgetLines.BudgetLineAccount}}</td>
+                <td
+                    style="color: {{if gt $budgetLines.BudgetLineIncome 0}} #4CAF50 {{else if lt $budgetLines.BudgetLineIncome 0}} #E57373 {{else}} black{{end}};">
+                    {{formatMoney $budgetLines.BudgetLineIncome}} kr</td>
+                <td
+                    style="color: {{if gt $budgetLines.BudgetLineExpense 0}} #4CAF50 {{else if lt $budgetLines.BudgetLineExpense 0}} #E57373 {{else}} black{{end}};">
+                    {{formatMoney $budgetLines.BudgetLineExpense}} kr</td>
+                <td></td>
+            </tr>
             {{end}}
+            <tr style="height: 1em;"></tr>
             {{end}}
         </table>
     </div>
 </body>
-</html>
 
+</html>

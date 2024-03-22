@@ -20,6 +20,16 @@ h1 {
     display: block;
 }
 
+#costCentreNames a:hover {
+    font-weight: bold;
+}
+
+#costCentreNames ul {
+    list-style-type: none;
+    line-height: 1.6;
+}
+
+
 #costCentreNames >div {
     display: flex;
     align-items: center;

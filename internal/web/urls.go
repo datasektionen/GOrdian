@@ -4,11 +4,12 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
-	"github.com/datasektionen/GOrdian/internal/excel"
 	"html/template"
 	"log/slog"
 	"net/http"
 	"strconv"
+
+	"github.com/datasektionen/GOrdian/internal/excel"
 )
 
 //go:embed templates/*.html
@@ -152,7 +153,7 @@ func getBudgetLines(db *sql.DB, costCentreID int) ([]excel.BudgetLine, error) {
 }
 
 func getCostCentres(db *sql.DB) ([]excel.CostCentre, error) {
-	var costCentresGetStatementStatic = `SELECT id, name, type FROM cost_centres`
+	var costCentresGetStatementStatic = `SELECT id, name, type FROM cost_centres ORDER BY name`
 	result, err := db.Query(costCentresGetStatementStatic)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get cost centres from database: %v", err)

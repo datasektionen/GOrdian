@@ -96,7 +96,8 @@ func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 		return fmt.Errorf("failed get scan cost centre information from database: %v", err)
 	}
 
-	secondaryCostCentresWithBudgetLinesList, err = calculateSecondaryCostCentre(secondaryCostCentresWithBudgetLinesList)
+	//calc the total incomes, expenses and results of all cost centres in the list
+	secondaryCostCentresWithBudgetLinesList, err = calculateSecondaryCostCentres(secondaryCostCentresWithBudgetLinesList)
 	if err != nil {
 		return fmt.Errorf("failed calculate secondary cost centre values: %v", err)
 	}
@@ -110,7 +111,7 @@ func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	return nil
 }
 
-func calculateSecondaryCostCentre(secondaryCostCentresWithBudgetLinesList []secondaryCostCentresWithBudgetLines) ([]secondaryCostCentresWithBudgetLines, error) {
+func calculateSecondaryCostCentres(secondaryCostCentresWithBudgetLinesList []secondaryCostCentresWithBudgetLines) ([]secondaryCostCentresWithBudgetLines, error) {
 	for index, sCCWithBudgetLines := range secondaryCostCentresWithBudgetLinesList {
 		var totalIncome int
 		var totalExpense int
@@ -122,7 +123,6 @@ func calculateSecondaryCostCentre(secondaryCostCentresWithBudgetLinesList []seco
 		secondaryCostCentresWithBudgetLinesList[index].SecondaryCostCentreTotalExpense = totalExpense
 		secondaryCostCentresWithBudgetLinesList[index].SecondaryCostCentreTotalResult = totalIncome + totalExpense
 	}
-	fmt.Println(secondaryCostCentresWithBudgetLinesList)
 	return secondaryCostCentresWithBudgetLinesList, nil
 }
 

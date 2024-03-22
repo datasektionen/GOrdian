@@ -5,15 +5,12 @@
 <body>
     <div id="methone-container-replace"></div>
     <div id="costCentre">
-        <div style="background-color: #78909C; color: white; margin-top: -20px; padding-bottom: 10px;">
-            <h1 style="font-weight: bolder; vertical-align: middle; font-size: 42px;">Budget: {{.costCentre.CostCentreName}}</h1>
+        <div style="background-color: #78909C !important; color: white; margin-top: -20px; padding-bottom: 10px;">
+            <h1 style="font-weight: bolder; font-size: 42px;">Budget: {{.costCentre.CostCentreName}}</h1>
         </div>
-
-        <br />
         <div id="content">
             <table>
-
-                <tr style="background-color: rgb(176,190,197);">
+                <tr style="background-color: rgb(176,190,197) !important;">
                     <th style="font-size: 15pt;">{{.costCentre.CostCentreName}}</th>
                     <th class="hide-on-mobile hide-on-half-desktop"></th>
                     <th
@@ -32,7 +29,7 @@
                     </th>
                 </tr>
                 <tr style="height: 1em;"></tr>
-                <tr style="background-color: rgb(176,190,197); ">
+                <tr style="background-color: rgb(176,190,197) !important; ">
                     <th>Budgetpost</th>
                     <th class="hide-on-mobile hide-on-half-desktop">Bokföringskonto</th>
                     <th class="hide-on-mobile" style="text-align: right;">Intäkter</th>
@@ -42,7 +39,7 @@
 
                 </tr>
                 {{range $_, $secondaryCostCentresWithBudgetLines := .secondaryCostCentresWithBudgetLinesList}}
-                <tr style="background-color: rgb(207,216,220);">
+                <tr style="background-color: rgb(207,216,220) !important;">
                     <th>{{$secondaryCostCentresWithBudgetLines.SecondaryCostCentreName}}</th>
                     <th class="hide-on-mobile hide-on-half-desktop"></th>
                     <th
@@ -59,7 +56,7 @@
                 </tr>
                 {{range $_, $budgetLines := $secondaryCostCentresWithBudgetLines.BudgetLines}}
                 <tr>
-                    <td style="white-space: wrap;">{{$budgetLines.BudgetLineName}}</td>
+                    <td style="white-space: wrap; color:black">{{$budgetLines.BudgetLineName}}</td>
                     <td class="hide-on-mobile hide-on-half-desktop">{{$budgetLines.BudgetLineAccount}}</td>
                     <td
                         class="hide-on-mobile"
@@ -79,6 +76,8 @@
                 {{end}}
             </table>
         </div>
-        <footer class="footer-toolbar" style="align-items: center; text-align: center;">"JÄVLA AURORA"</footer>
+        <footer class="footer-toolbar" style="align-items: center; text-align: center;">
+            <p>{{ .motd }} © 2024 GOrdian</p>
+        </footer>
     </body>
 </html>

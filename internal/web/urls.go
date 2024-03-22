@@ -22,7 +22,7 @@ var templates *template.Template
 
 func Mount(mux *http.ServeMux, db *sql.DB) error {
 	var err error
-	templates, err = template.ParseFS(templatesFS, "templates/*.html")
+	templates, err = template.New("").Funcs(map[string]any{"formatMoney": formatMoney}).ParseFS(templatesFS, "templates/*.html")
 	if err != nil {
 		return err
 	}
@@ -31,6 +31,21 @@ func Mount(mux *http.ServeMux, db *sql.DB) error {
 	mux.Handle("/costcentre/{costCentreIDPath}", page(db, costCentrePage))
 
 	return nil
+}
+
+func formatMoney(value int) string {
+	numStr := strconv.Itoa(value)
+	length := len(numStr)
+	var result string
+
+	for i := 0; i < length; i++ {
+		if i > 0 && (length-i)%3 == 0 {
+			result += " "
+		}
+		result += string(numStr[i])
+	}
+
+	return result
 }
 
 func page(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, db *sql.DB) error) http.Handler {

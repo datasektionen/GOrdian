@@ -3,35 +3,37 @@
 {{template "head.html"}}
 <body>
     <div id="methone-container-replace"></div>
-    <h1>{{ .motd }}</h1>
+    <div style="background-color: #78909C !important; color: white; padding: 20px;">
+        <h1 style="font-weight: bolder; font-size: 42px;">Datasektionens budgetsystem</h1>
+    </div>
     <div id="costCentreNames">
-        <div>
+        <div class="btn-group">
             <h1> Nämnder </h1>
-            <ul>
-                {{range $_,$committee:= .committees}} <li><a href="/costcentre/{{$committee.CostCentreID}}"> {{$committee.CostCentreName}} </a></li>{{end}}
+            <ul style="display: grid;
+            grid-template-columns: 1fr 1fr 1fr;">
+                {{range $_,$committee:= .committees}} <button onclick="location.href='/costcentre/{{$committee.CostCentreID}}'"> {{$committee.CostCentreName}} </button>{{end}}
             </ul>
         </div>
-        <div>
+        <div class="btn-group">
             <h1> Projekt </h1>
-            <ul>
+            <ul style="display: grid;
+            grid-template-columns: 1fr 1fr;">
                 {{range $_,$project:= .projects}}
-                <li>
-                    <a href="/costcentre/{{$project.CostCentreID}}"> {{$project.CostCentreName}} </a>
-                </li>
+                    <button onclick="location.href='/costcentre/{{$project.CostCentreID}}'"> {{$project.CostCentreName}} </button>
                 {{end}}
             </ul>
         </div>
-        <div>
+        <div class="btn-group">
             <h1> Övrigt </h1>
-            <ul>
+            <ul style="display: grid;
+            grid-template-columns: 1fr;">
                 {{range $_,$other:= .others}} 
-                <li>
-                    <a href="/costcentre/{{$other.CostCentreID}}"> {{$other.CostCentreName}} </a>
-                </li>
+                    <button onclick="location.href='/costcentre/{{$other.CostCentreID}}'"> {{$other.CostCentreName}} </button>
                 {{end}}
             </ul>
         </div>
     </div>
+    <br/>
     <footer class="footer-toolbar" style="align-items: center; text-align: center;">
         <p>{{ .motd }} © 2024 GOrdian</p>
     </footer>

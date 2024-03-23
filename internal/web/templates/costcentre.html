@@ -1,25 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 {{template "head.html"}}
-
 <body>
     <div id="methone-container-replace"></div>
+    <div style="background-color: #78909C !important; color: white; padding: 20px;">
+        <h1 style="font-weight: bolder; font-size: 42px;">Budget: {{.costCentre.CostCentreName}}</h1>
+    </div>
     <div id="costCentre">
-        <div style="background-color: #78909C !important; color: white; margin-top: -20px; padding-bottom: 10px;">
-            <h1 style="font-weight: bolder; font-size: 42px;">Budget: {{.costCentre.CostCentreName}}</h1>
-        </div>
         <div id="content">
             <table>
                 <tr style="background-color: rgb(176,190,197) !important;">
                     <th style="font-size: 15pt;">{{.costCentre.CostCentreName}}</th>
                     <th class="hide-on-mobile hide-on-half-desktop"></th>
-                    <th
-                        class="hide-on-mobile"
+                    <th class="hide-on-mobile"
                         style="color: {{if gt .costCentreTotalIncome 0}} #4CAF50 {{else if lt .costCentreTotalIncome 0}} #E57373 {{else}} black{{end}}; text-align: right; font-size: 15pt;">
                         {{formatMoney .costCentreTotalIncome}} kr
                     </th>
-                    <th
-                        class="hide-on-mobile"
+                    <th class="hide-on-mobile"
                         style="color: {{if gt .costCentreTotalExpense 0}} #4CAF50 {{else if lt .costCentreTotalExpense 0}} #E57373 {{else}} black{{end}}; text-align: right; font-size: 15pt;">
                         {{formatMoney .costCentreTotalExpense}} kr
                     </th>
@@ -42,12 +39,10 @@
                 <tr style="background-color: rgb(207,216,220) !important;">
                     <th>{{$secondaryCostCentresWithBudgetLines.SecondaryCostCentreName}}</th>
                     <th class="hide-on-mobile hide-on-half-desktop"></th>
-                    <th
-                        class="hide-on-mobile"
+                    <th class="hide-on-mobile"
                         style="color: {{if gt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalIncome 0}} #4CAF50 {{else if lt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalIncome 0}} #E57373 {{else}} black{{end}}; text-align: right;">
                         {{formatMoney $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalIncome}} kr</th>
-                    <th
-                        class="hide-on-mobile"
+                    <th class="hide-on-mobile"
                         style="color: {{if gt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalExpense 0}} #4CAF50 {{else if lt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalExpense 0}} #E57373 {{else}} black{{end}}; text-align: right;">
                         {{formatMoney $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalExpense}} kr</th>
                     <th
@@ -58,12 +53,10 @@
                 <tr>
                     <td style="white-space: wrap; color:black">{{$budgetLines.BudgetLineName}}</td>
                     <td class="hide-on-mobile hide-on-half-desktop">{{$budgetLines.BudgetLineAccount}}</td>
-                    <td
-                        class="hide-on-mobile"
+                    <td class="hide-on-mobile"
                         style="color: {{if gt $budgetLines.BudgetLineIncome 0}} #4CAF50 {{else if lt $budgetLines.BudgetLineIncome 0}} #E57373 {{else}} black{{end}}; text-align: right;">
                         {{formatMoney $budgetLines.BudgetLineIncome}} kr</td>
-                    <td
-                        class="hide-on-mobile"
+                    <td class="hide-on-mobile"
                         style="color: {{if gt $budgetLines.BudgetLineExpense 0}} #4CAF50 {{else if lt $budgetLines.BudgetLineExpense 0}} #E57373 {{else}} black{{end}}; text-align: right;">
                         {{formatMoney $budgetLines.BudgetLineExpense}} kr</td>
                     <td
@@ -79,5 +72,6 @@
         <footer class="footer-toolbar" style="align-items: center; text-align: center;">
             <p>{{ .motd }} © 2024 GOrdian</p>
         </footer>
-    </body>
+</body>
+
 </html>

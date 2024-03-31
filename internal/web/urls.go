@@ -3,13 +3,19 @@ package web
 import (
 	"database/sql"
 	"embed"
+	"encoding/json"
 	"fmt"
+	"github.com/datasektionen/GOrdian/internal/config"
 	"html/template"
 	"log/slog"
 	"net/http"
 	"strconv"
 
 	"github.com/datasektionen/GOrdian/internal/excel"
+)
+
+const (
+	loginSessionCookieName = "login-session"
 )
 
 //go:embed templates/*.html
@@ -22,13 +28,18 @@ var templates *template.Template
 
 func Mount(mux *http.ServeMux, db *sql.DB) error {
 	var err error
+	tokenURL := config.GetEnv().LoginURL + "/login?callback=" + config.GetEnv().ServerURL + "/token?token="
 	templates, err = template.New("").Funcs(map[string]any{"formatMoney": formatMoney, "add": add}).ParseFS(templatesFS, "templates/*.html")
 	if err != nil {
 		return err
 	}
 	mux.Handle("/static/", http.FileServerFS(staticFiles))
-	mux.Handle("/{$}", page(db, indexPage))
-	mux.Handle("/costcentre/{costCentreIDPath}", page(db, costCentrePage))
+	mux.Handle("/{$}", route(db, indexPage))
+	mux.Handle("/costcentre/{costCentreIDPath}", route(db, costCentrePage))
+	mux.Handle("/login", http.RedirectHandler(tokenURL, http.StatusSeeOther))
+	mux.Handle("/token", route(db, tokenPage))
+	mux.Handle("/logout", route(db, logoutPage))
+	mux.Handle("/admin", authRoute(db, adminPage, []string{"admin", "view-all"}))
 
 	return nil
 }
@@ -52,7 +63,7 @@ func formatMoney(value int) string {
 	return result
 }
 
-func page(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, db *sql.DB) error) http.Handler {
+func route(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, db *sql.DB) error) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := handler(w, r, db)
 		if err != nil {
@@ -61,6 +72,88 @@ func page(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, db *s
 			w.Write([]byte("Internal server error"))
 		}
 	})
+}
+
+func authRoute(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string) error, requiredPerms []string) http.Handler {
+	return route(db, func(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+		loginCookie, err := r.Cookie(loginSessionCookieName)
+		if err != nil {
+			slog.Error("Failed to get login cookie", "error", err)
+			w.WriteHeader(500)
+			w.Write([]byte("Internal server error"))
+		}
+		loginUser, err := http.Get(config.GetEnv().LoginURL + "/verify/" + loginCookie.Value + "?api_key=" + config.GetEnv().LoginToken)
+		if err != nil {
+			slog.Error("No response from login", "error", err)
+			w.WriteHeader(500)
+			w.Write([]byte("Internal server error"))
+		}
+		var loginBody struct {
+			User string `json:"user"`
+		}
+		err = json.NewDecoder(loginUser.Body).Decode(&loginBody)
+		if err != nil {
+			return fmt.Errorf("failed to decode user body from json: %v", err)
+		}
+
+		userPerms, err := http.Get(config.GetEnv().PlsURL + "/api/user/" + loginBody.User + "/" + config.GetEnv().PlsSystem)
+
+		var perms []string
+		err = json.NewDecoder(userPerms.Body).Decode(&perms)
+		if err != nil {
+			return fmt.Errorf("failed to decode perms body from json: %v", err)
+		}
+
+		if !allObjectsPresent(requiredPerms, perms) {
+			slog.Error("Error from handler", "error", err)
+			w.WriteHeader(http.StatusForbidden)
+			w.Write([]byte("Forbidden"))
+			return nil
+		}
+		return handler(w, r, db, perms)
+	})
+
+}
+
+func allObjectsPresent(list1, list2 []string) bool {
+	// Iterate through list1 and check if each object is present in list2
+	for _, obj1 := range list1 {
+		found := false
+		for _, obj2 := range list2 {
+			if obj1 == obj2 {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+	return true
+}
+
+func adminPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string) error {
+	if err := templates.ExecuteTemplate(w, "admin.html", map[string]any{
+		"permissions": perms,
+	}); err != nil {
+		return fmt.Errorf("could not render template: %w", err)
+	}
+	return nil
+}
+
+func tokenPage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+	sessionCookieVal := r.FormValue("token")
+	sessionCookie := http.Cookie{Name: loginSessionCookieName, Value: sessionCookieVal}
+	http.SetCookie(w, &sessionCookie)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+	return nil
+}
+
+func logoutPage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+	sessionCookie := http.Cookie{Name: loginSessionCookieName, MaxAge: -1}
+	http.SetCookie(w, &sessionCookie)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+	return nil
 }
 
 func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {

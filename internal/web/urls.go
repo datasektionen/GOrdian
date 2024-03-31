@@ -34,8 +34,8 @@ func Mount(mux *http.ServeMux, db *sql.DB) error {
 		return err
 	}
 	mux.Handle("/static/", http.FileServerFS(staticFiles))
-	mux.Handle("/{$}", route(db, indexPage))
-	mux.Handle("/costcentre/{costCentreIDPath}", route(db, costCentrePage))
+	mux.Handle("/{$}", authRoute(db, indexPage, []string{}))
+	mux.Handle("/costcentre/{costCentreIDPath}", authRoute(db, costCentrePage, []string{}))
 	mux.Handle("/login", http.RedirectHandler(tokenURL, http.StatusSeeOther))
 	mux.Handle("/token", route(db, tokenPage))
 	mux.Handle("/logout", route(db, logoutPage))
@@ -100,32 +100,28 @@ func authRoute(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, 
 			return fmt.Errorf("failed to decode perms body from json: %v", err)
 		}
 
-		if !allObjectsPresent(requiredPerms, perms) {
+		if !oneObjectPresent(requiredPerms, perms) {
 			slog.Error("Error from handler", "error", err)
 			w.WriteHeader(http.StatusForbidden)
 			w.Write([]byte("Forbidden"))
 			return nil
 		}
+		println(loginCookie)
 		return handler(w, r, db, perms)
 	})
 
 }
 
-func allObjectsPresent(list1, list2 []string) bool {
-	// Iterate through list1 and check if each object is present in list2
+func oneObjectPresent(list1, list2 []string) bool {
+	// Iterate through list1 and check if one object is present in list2
 	for _, obj1 := range list1 {
-		found := false
 		for _, obj2 := range list2 {
 			if obj1 == obj2 {
-				found = true
-				break
+				return true
 			}
 		}
-		if !found {
-			return false
-		}
 	}
-	return true
+	return false
 }
 
 func adminPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string) error {
@@ -152,7 +148,7 @@ func logoutPage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	return nil
 }
 
-func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string) error {
 	costCentres, err := getCostCentres(db)
 	if err != nil {
 		return fmt.Errorf("failed get scan cost centre information from database: %v", err)
@@ -162,17 +158,18 @@ func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 		return fmt.Errorf("failed spit cost centres on type: %v", err)
 	}
 	if err := templates.ExecuteTemplate(w, "index.html", map[string]any{
-		"motd":       "You have very many money",
-		"committees": committeeCostCentres,
-		"projects":   projectCostCentres,
-		"others":     otherCostCentres,
+		"motd":        "You have very many money",
+		"committees":  committeeCostCentres,
+		"projects":    projectCostCentres,
+		"others":      otherCostCentres,
+		"permissions": perms,
 	}); err != nil {
 		return fmt.Errorf("Could not render template: %w", err)
 	}
 	return nil
 }
 
-func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string) error {
 	costCentreIDString := r.PathValue("costCentreIDPath")
 	costCentreIDInt, err := strconv.Atoi(costCentreIDString)
 	if err != nil {
@@ -221,6 +218,7 @@ func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 		"costCentreTotalIncome":  costCentreTotalIncome,
 		"costCentreTotalExpense": costCentreTotalExpense,
 		"costCentreTotalResult":  costCentreTotalResult,
+		"permissions":            perms,
 	}); err != nil {
 		return fmt.Errorf("could not render template: %w", err)
 	}

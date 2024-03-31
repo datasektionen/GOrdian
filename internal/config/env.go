@@ -22,10 +22,10 @@ func GetEnv() EnvVar {
 		DBUser:     "alexander",
 		DBPass:     "kopis",
 		DBName:     "budget_local",
-		LoginURL:   "login2798.datasektionen.se",
+		LoginURL:   "https://login.datasektionen.se",
 		LoginToken: "",
-		PlsURL:     "pls.datasektionen.se",
-		PlsSystem:  "GOrdian",
+		PlsURL:     "https://pls.datasektionen.se",
+		PlsSystem:  "gordian",
 		ServerPort: "3000",
 		ServerURL:  "http://localhost:3000",
 	}

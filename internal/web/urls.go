@@ -78,15 +78,11 @@ func authRoute(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, 
 	return route(db, func(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 		loginCookie, err := r.Cookie(loginSessionCookieName)
 		if err != nil {
-			slog.Error("Failed to get login cookie", "error", err)
-			w.WriteHeader(500)
-			w.Write([]byte("Internal server error"))
+			return fmt.Errorf("failed to get login cookie: %v", err)
 		}
 		loginUser, err := http.Get(config.GetEnv().LoginURL + "/verify/" + loginCookie.Value + "?api_key=" + config.GetEnv().LoginToken)
 		if err != nil {
-			slog.Error("No response from login", "error", err)
-			w.WriteHeader(500)
-			w.Write([]byte("Internal server error"))
+			return fmt.Errorf("no response from login: %v", err)
 		}
 		var loginBody struct {
 			User string `json:"user"`

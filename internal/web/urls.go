@@ -74,12 +74,12 @@ func route(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, db *
 	})
 }
 
-func authRoute(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string) error, requiredPerms []string) http.Handler {
+func authRoute(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error, requiredPerms []string) http.Handler {
 	return route(db, func(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 		loginCookie, err := r.Cookie(loginSessionCookieName)
 		if err != nil {
 			if len(requiredPerms) == 0 {
-				return handler(w, r, db, []string{})
+				return handler(w, r, db, []string{}, false)
 			}
 			slog.Error("failed to get login cookie", "error", err)
 			w.WriteHeader(http.StatusForbidden)
@@ -88,8 +88,11 @@ func authRoute(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, 
 		}
 		loginUser, err := http.Get(config.GetEnv().LoginURL + "/verify/" + loginCookie.Value + "?api_key=" + config.GetEnv().LoginToken)
 		if err != nil {
-
 			return fmt.Errorf("no response from login: %v", err)
+		}
+
+		if loginUser.StatusCode != 200 {
+			return handler(w, r, db, []string{}, false)
 		}
 		var loginBody struct {
 			User string `json:"user"`
@@ -98,7 +101,6 @@ func authRoute(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, 
 		if err != nil {
 			return fmt.Errorf("failed to decode user body from json: %v", err)
 		}
-
 		userPerms, err := http.Get(config.GetEnv().PlsURL + "/api/user/" + loginBody.User + "/" + config.GetEnv().PlsSystem)
 
 		var perms []string
@@ -113,7 +115,7 @@ func authRoute(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, 
 			w.Write([]byte("Forbidden"))
 			return nil
 		}
-		return handler(w, r, db, perms)
+		return handler(w, r, db, perms, true)
 	})
 
 }
@@ -130,9 +132,10 @@ func sliceContains(list1 []string, list2 ...string) bool {
 	return false
 }
 
-func adminPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string) error {
+func adminPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
 	if err := templates.ExecuteTemplate(w, "admin.html", map[string]any{
 		"permissions": perms,
+		"loggedIn":    loggedIn,
 	}); err != nil {
 		return fmt.Errorf("could not render template: %w", err)
 	}
@@ -154,7 +157,7 @@ func logoutPage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	return nil
 }
 
-func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string) error {
+func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
 	costCentres, err := getCostCentres(db)
 	if err != nil {
 		return fmt.Errorf("failed get scan cost centre information from database: %v", err)
@@ -169,13 +172,14 @@ func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 		"projects":    projectCostCentres,
 		"others":      otherCostCentres,
 		"permissions": perms,
+		"loggedIn":    loggedIn,
 	}); err != nil {
 		return fmt.Errorf("Could not render template: %w", err)
 	}
 	return nil
 }
 
-func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string) error {
+func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
 	costCentreIDString := r.PathValue("costCentreIDPath")
 	costCentreIDInt, err := strconv.Atoi(costCentreIDString)
 	if err != nil {
@@ -225,6 +229,7 @@ func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []
 		"costCentreTotalExpense": costCentreTotalExpense,
 		"costCentreTotalResult":  costCentreTotalResult,
 		"permissions":            perms,
+		"loggedIn":               loggedIn,
 	}); err != nil {
 		return fmt.Errorf("could not render template: %w", err)
 	}

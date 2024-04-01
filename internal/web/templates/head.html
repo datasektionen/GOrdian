@@ -9,8 +9,8 @@
         window.methone_conf = {
         system_name: "GOrdian",
         color_scheme: "blue_grey",
-        login_text: "Login", // Default null, null hides button
-        login_href: "/login",
+        login_text: {{if .loggedIn}}"Logga ut"{{else}}"Logga in"{{end}}, // Default null, null hides button
+        login_href: {{if .loggedIn}}"/logout"{{else}}"/login"{{end}},
         links: [
           {
           str: "Hem",

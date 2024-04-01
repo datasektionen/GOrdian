@@ -29,7 +29,7 @@ var templates *template.Template
 func Mount(mux *http.ServeMux, db *sql.DB) error {
 	var err error
 	tokenURL := config.GetEnv().LoginURL + "/login?callback=" + config.GetEnv().ServerURL + "/token?token="
-	templates, err = template.New("").Funcs(map[string]any{"formatMoney": formatMoney, "add": add}).ParseFS(templatesFS, "templates/*.html")
+	templates, err = template.New("").Funcs(map[string]any{"formatMoney": formatMoney, "add": add, "sliceContains": sliceContains}).ParseFS(templatesFS, "templates/*.html")
 	if err != nil {
 		return err
 	}
@@ -78,10 +78,17 @@ func authRoute(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, 
 	return route(db, func(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 		loginCookie, err := r.Cookie(loginSessionCookieName)
 		if err != nil {
-			return fmt.Errorf("failed to get login cookie: %v", err)
+			if len(requiredPerms) == 0 {
+				return handler(w, r, db, []string{})
+			}
+			slog.Error("failed to get login cookie", "error", err)
+			w.WriteHeader(http.StatusForbidden)
+			w.Write([]byte("Not logged in"))
+			return nil
 		}
 		loginUser, err := http.Get(config.GetEnv().LoginURL + "/verify/" + loginCookie.Value + "?api_key=" + config.GetEnv().LoginToken)
 		if err != nil {
+
 			return fmt.Errorf("no response from login: %v", err)
 		}
 		var loginBody struct {
@@ -100,19 +107,18 @@ func authRoute(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, 
 			return fmt.Errorf("failed to decode perms body from json: %v", err)
 		}
 
-		if !oneObjectPresent(requiredPerms, perms) {
+		if !sliceContains(requiredPerms, perms...) && len(requiredPerms) != 0 {
 			slog.Error("Error from handler", "error", err)
 			w.WriteHeader(http.StatusForbidden)
 			w.Write([]byte("Forbidden"))
 			return nil
 		}
-		println(loginCookie)
 		return handler(w, r, db, perms)
 	})
 
 }
 
-func oneObjectPresent(list1, list2 []string) bool {
+func sliceContains(list1 []string, list2 ...string) bool {
 	// Iterate through list1 and check if one object is present in list2
 	for _, obj1 := range list1 {
 		for _, obj2 := range list2 {

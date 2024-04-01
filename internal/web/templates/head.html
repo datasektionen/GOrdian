@@ -20,6 +20,10 @@
             str: "Rambudget",
             href: "/overview",
           },
+            {{if sliceContains .permissions "admin" "view-all" }} {
+                str: "Administrera",
+                href: "/admin",
+            }, {{end}}
         ]
         }
     </script>

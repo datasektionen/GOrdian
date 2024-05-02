@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/datasektionen/GOrdian/internal/config"
+	"github.com/datasektionen/GOrdian/internal/database"
 	"html/template"
 	"log/slog"
 	"net/http"
@@ -40,6 +41,7 @@ func Mount(mux *http.ServeMux, db *sql.DB) error {
 	mux.Handle("/token", route(db, tokenPage))
 	mux.Handle("/logout", route(db, logoutPage))
 	mux.Handle("/admin", authRoute(db, adminPage, []string{"admin", "view-all"}))
+	mux.Handle("/admin/upload", authRoute(db, uploadPage, []string{"admin"}))
 
 	return nil
 }
@@ -139,6 +141,19 @@ func adminPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 	}); err != nil {
 		return fmt.Errorf("could not render template: %w", err)
 	}
+	return nil
+}
+
+func uploadPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
+	file, _, err := r.FormFile("budgetFile")
+	if err != nil {
+		return fmt.Errorf("could not read file from form: %w", err)
+	}
+	err = database.SaveBudget(file)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 	return nil
 }
 

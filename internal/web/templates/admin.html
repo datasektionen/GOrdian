@@ -7,7 +7,12 @@
     <h1 style="font-weight: bolder; font-size: 42px;">Admin</h1>
 </div>
 <div>
-    Fippel
+    Ladda upp din budget här!
+    Den ska vara i xlsx format, annars så dör du
+    <form action="/admin/upload">
+        <input type="file" name="budgetFile" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+        <input type="submit">
+    </form>
 </div>
 <footer class="footer-toolbar" style="align-items: center; text-align: center;">
     <p>© 2024 GOrdian</p>

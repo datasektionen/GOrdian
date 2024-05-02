@@ -3,6 +3,7 @@ package excel
 import (
 	"fmt"
 	"github.com/xuri/excelize/v2"
+	"io"
 	"strconv"
 	"strings"
 )
@@ -46,8 +47,9 @@ const (
 	costCentreTypeCell         = "A3"
 )
 
-func ReadExcel(path string) ([]CostCentre, []SecondaryCostCentre, []BudgetLine, error) {
-	file, err := excelize.OpenFile(path)
+func ReadExcel(fileReader io.Reader) ([]CostCentre, []SecondaryCostCentre, []BudgetLine, error) {
+	//file, err := excelize.OpenFile(path)
+	file, err := excelize.OpenReader(fileReader)
 
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to open Excel file: %v", err)

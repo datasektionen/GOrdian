@@ -9,7 +9,7 @@
 <div>
     Ladda upp din budget här!
     Den ska vara i xlsx format, annars så dör du
-    <form action="/admin/upload">
+    <form action="/admin/upload" method="post">
         <input type="file" name="budgetFile" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
         <input type="submit">
     </form>

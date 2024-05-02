@@ -15,7 +15,7 @@ COPY . .
 
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=cache,target=/root/.cache/go-build/ \
-    GCO_ENABLED=0 go build -o /bin/server .
+    GCO_ENABLED=0 go build -o /bin/server ./cmd/web
 
 FROM alpine:${ALPINE_VERSION}
 

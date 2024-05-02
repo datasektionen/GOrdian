@@ -27,7 +27,7 @@ CREATE TABLE secondary_cost_centres (
     updated_at timestamp
 );
 
-CREATE TABLE budgets (
+CREATE TABLE budgetfiles (
     id integer NOT NULL,
     filename TEXT NOT NULL,
     file TEXT NOT NULL,

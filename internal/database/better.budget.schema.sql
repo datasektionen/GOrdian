@@ -26,3 +26,9 @@ CREATE TABLE secondary_cost_centres (
     created_at timestamp,
     updated_at timestamp
 );
+
+CREATE TABLE budgets (
+    id integer NOT NULL,
+    file TEXT NOT NULL,
+    created_at timestamp
+);

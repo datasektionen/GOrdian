@@ -42,6 +42,9 @@ func Mount(mux *http.ServeMux, db *sql.DB) error {
 	mux.Handle("/logout", route(db, logoutPage))
 	mux.Handle("/admin", authRoute(db, adminPage, []string{"admin", "view-all"}))
 	mux.Handle("/admin/upload", authRoute(db, uploadPage, []string{"admin"}))
+	mux.Handle("/api/CostCentres", route(db, apiCostCentres))
+	mux.Handle("/api/SecondaryCostCentres", route(db, apiSecondaryCostCentre))
+	mux.Handle("/api/BudgetLines", route(db, apiBudgetLine))
 
 	return nil
 }
@@ -134,6 +137,47 @@ func sliceContains(list1 []string, list2 ...string) bool {
 	return false
 }
 
+func apiCostCentres(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+	costCentres, err := getCostCentres(db)
+	if err != nil {
+		return fmt.Errorf("failed get scan cost centres information from database: %v", err)
+	}
+	err = json.NewEncoder(w).Encode(costCentres)
+	if err != nil {
+		return fmt.Errorf("failed to encode cost centres to json: %v", err)
+	}
+	return nil
+}
+
+func apiSecondaryCostCentre(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+	idCC, err := strconv.Atoi(r.FormValue("id"))
+	if err != nil {
+		return fmt.Errorf("failed to convert secondary cost centre id to int: %v", err)
+	}
+	secondaryCostCentres, err := getSecondaryCostCentresByCostCentreID(db, idCC)
+	if err != nil {
+		return fmt.Errorf("failed get scan sendondary cost centres information from database: %v", err)
+	}
+	err = json.NewEncoder(w).Encode(secondaryCostCentres)
+	if err != nil {
+		return fmt.Errorf("failed to encode secondary cost centres to json: %v", err)
+	}
+	return nil
+}
+
+func apiBudgetLine(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+	idSCC, err := strconv.Atoi(r.FormValue("id"))
+	budgetLines, err := getBudgetLinesBySecondaryCostCentreID(db, idSCC)
+	if err != nil {
+		return fmt.Errorf("failed get scan budget lines information from database: %v", err)
+	}
+	err = json.NewEncoder(w).Encode(budgetLines)
+	if err != nil {
+		return fmt.Errorf("failed to encode budget lines to json: %v", err)
+	}
+	return nil
+}
+
 func adminPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
 	if err := templates.ExecuteTemplate(w, "admin.html", map[string]any{
 		"permissions": perms,
@@ -201,7 +245,7 @@ func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []
 		return fmt.Errorf("failed to convert cost centre id from string to int: %v", err)
 	}
 
-	budgetLines, err := getBudgetLines(db, costCentreIDInt)
+	budgetLines, err := getBudgetLinesByCostCentreID(db, costCentreIDInt)
 	if err != nil {
 		return fmt.Errorf("failed get scan budget line information from database: %v", err)
 	}
@@ -286,7 +330,7 @@ type secondaryCostCentresWithBudgetLines struct {
 	BudgetLines                     []excel.BudgetLine
 }
 
-func getBudgetLines(db *sql.DB, costCentreID int) ([]excel.BudgetLine, error) {
+func getBudgetLinesByCostCentreID(db *sql.DB, costCentreID int) ([]excel.BudgetLine, error) {
 	var budgetLinesGetStatementStatic = `
 		SELECT 
     		budget_lines.id,
@@ -319,6 +363,76 @@ func getBudgetLines(db *sql.DB, costCentreID int) ([]excel.BudgetLine, error) {
 			&budgetLine.BudgetLineAccount,
 			&budgetLine.SecondaryCostCentreID,
 			&budgetLine.SecondaryCostCentreName,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan budget line from query result: %v", err)
+		}
+		budgetLines = append(budgetLines, budgetLine)
+	}
+	return budgetLines, nil
+}
+
+func getSecondaryCostCentresByCostCentreID(db *sql.DB, costCentreID int) ([]excel.SecondaryCostCentre, error) {
+	var SecondaryCostCentresGetStatementStatic = `
+		SELECT 
+    		id,
+    		name,
+    		cost_centre_id
+		FROM secondary_cost_centres
+		WHERE cost_centre_id = $1
+		ORDER BY id
+	`
+	result, err := db.Query(SecondaryCostCentresGetStatementStatic, costCentreID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get secondary cost centres from database: %v", err)
+	}
+	var secondaryCostCentres []excel.SecondaryCostCentre
+	for result.Next() {
+		var secondaryCostCentre excel.SecondaryCostCentre
+
+		err := result.Scan(
+			&secondaryCostCentre.SecondaryCostCentreID,
+			&secondaryCostCentre.SecondaryCostCentreName,
+			&secondaryCostCentre.CostCentreID,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan secondary cost centre from query result: %v", err)
+		}
+		secondaryCostCentres = append(secondaryCostCentres, secondaryCostCentre)
+	}
+	return secondaryCostCentres, nil
+}
+
+func getBudgetLinesBySecondaryCostCentreID(db *sql.DB, secondaryCostCentreID int) ([]excel.BudgetLine, error) {
+	var budgetLinesGetStatementStatic = `
+		SELECT 
+    		id,
+    		name,
+    		income,
+			expense,
+			comment,
+			account,
+			secondary_cost_centre_id
+		FROM budget_lines
+		WHERE secondary_cost_centre_id = $1
+		ORDER BY id
+	`
+	result, err := db.Query(budgetLinesGetStatementStatic, secondaryCostCentreID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get budgetlines from database: %v", err)
+	}
+	var budgetLines []excel.BudgetLine
+	for result.Next() {
+		var budgetLine excel.BudgetLine
+
+		err := result.Scan(
+			&budgetLine.BudgetLineID,
+			&budgetLine.BudgetLineName,
+			&budgetLine.BudgetLineIncome,
+			&budgetLine.BudgetLineExpense,
+			&budgetLine.BudgetLineComment,
+			&budgetLine.BudgetLineAccount,
+			&budgetLine.SecondaryCostCentreID,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan budget line from query result: %v", err)

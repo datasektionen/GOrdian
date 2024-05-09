@@ -16,18 +16,18 @@ type CostCentre struct {
 
 type SecondaryCostCentre struct {
 	CostCentreID            int
-	CostCentreName          string
-	CostCentreType          string
+	CostCentreName          string `json:",omitempty"`
+	CostCentreType          string `json:",omitempty"`
 	SecondaryCostCentreID   int
 	SecondaryCostCentreName string
 }
 
 type BudgetLine struct {
-	CostCentreID            int
-	CostCentreName          string
-	CostCentreType          string
+	CostCentreID            int    `json:",omitempty"`
+	CostCentreName          string `json:",omitempty"`
+	CostCentreType          string `json:",omitempty"`
 	SecondaryCostCentreID   int
-	SecondaryCostCentreName string
+	SecondaryCostCentreName string `json:",omitempty"`
 	BudgetLineID            int
 	BudgetLineName          string
 	BudgetLineAccount       string

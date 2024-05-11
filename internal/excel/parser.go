@@ -140,12 +140,12 @@ func ReadExcel(fileReader io.Reader) ([]CostCentre, []SecondaryCostCentre, []Bud
 					budgetLineAccount, budgetLineIncomeString, budgetLineExpenseString, budgetLineComment :=
 						getBudgetLineData(secondaryCostCentreIndex, colCellIndex, cols)
 
-					budgetLineIncome, err := sanitizeBudgetValue(budgetLineIncomeString)
+					budgetLineIncome, err := sanitizeBudgetValue(budgetLineIncomeString, secondaryCostCentre.CostCentreName)
 					if err != nil {
 						return nil, nil, nil, fmt.Errorf("failed to sanitize budget value: %v", err)
 					}
 
-					budgetLineExpense, err := sanitizeBudgetValue(budgetLineExpenseString)
+					budgetLineExpense, err := sanitizeBudgetValue(budgetLineExpenseString, secondaryCostCentre.CostCentreName)
 					if err != nil {
 						return nil, nil, nil, fmt.Errorf("failed to sanitize budget value: %v", err)
 					}
@@ -266,7 +266,7 @@ func convertCostCentreTypeToEnglish(costCentreType string) (string, error) {
 	}
 }
 
-func sanitizeBudgetValue(valueString string) (int, error) {
+func sanitizeBudgetValue(valueString string, costCentreName string) (int, error) {
 	// 0
 	// -72,500 kr
 	// 200,000 kr
@@ -278,16 +278,16 @@ func sanitizeBudgetValue(valueString string) (int, error) {
 	valueStringSanitized = strings.ReplaceAll(valueStringSanitized, "kr", "")
 
 	if strings.Contains(valueStringSanitized, ".") {
-		return 0, fmt.Errorf("failed to convert budget string \"%s\" to int: string contains \".\", check decimal places of incomes and expenses", valueString)
+		return 0, fmt.Errorf("failed to convert budget string \"%s\" to int in budget \"%s\": string contains \".\", check decimal places of incomes and expenses", valueString, costCentreName)
 	}
 
 	if valueStringSanitized == "" {
-		return 0, fmt.Errorf("failed to convert budget string \"%s\" to int: budget value is empty, check incomes and expenses for zero-values", valueString)
+		return 0, fmt.Errorf("failed to convert budget string \"%s\" to int in budget \"%s\": budget value is empty, check incomes and expenses for zero-values", valueString, costCentreName)
 	}
 
 	valueInt, err := strconv.Atoi(valueStringSanitized)
 	if err != nil {
-		return 0, fmt.Errorf("failed to convert budget string \"%s\" to int: %v", valueString, err)
+		return 0, fmt.Errorf("failed to convert budget string \"%s\" to int in budget \"%s\": %v", valueString, costCentreName, err)
 	}
 
 	return valueInt, nil

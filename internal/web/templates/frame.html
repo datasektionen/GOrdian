@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+{{template "head.html" .}}
+<body>
+<div id="methone-container-replace"></div>
+<div style="background-color: #78909C !important; color: white; padding: 20px;">
+    <h1 style="font-weight: bolder; font-size: 42px;">Rambudget</h1>
+</div>
+<div>
+    {{ .committeeframelines }}
+    {{ .projectframelines }}
+    {{ .otherframelines }}
+    {{ .totalframeline }}
+</div>
+<br/>
+<footer class="footer-toolbar" style="align-items: center; text-align: center;">
+    <p>{{ .motd }} © 2024 GOrdian</p>
+</footer>
+</body>
+</html>

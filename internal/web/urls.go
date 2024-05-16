@@ -15,6 +15,14 @@ import (
 	"github.com/datasektionen/GOrdian/internal/excel"
 )
 
+type FrameLine struct {
+	FrameLineName     string
+	FrameLineIncome   int
+	FrameLineExpense  int
+	FrameLineInternal int
+	FrameLineResult   int
+}
+
 const (
 	loginSessionCookieName = "login-session"
 )
@@ -231,7 +239,7 @@ func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 	}
 	committeeCostCentres, projectCostCentres, otherCostCentres, err := splitCostCentresOnType(costCentres)
 	if err != nil {
-		return fmt.Errorf("failed spit cost centres on type: %v", err)
+		return fmt.Errorf("failed to split cost centres on type: %v", err)
 	}
 	if err := templates.ExecuteTemplate(w, "index.html", map[string]any{
 		"motd":        "You have very many money",
@@ -247,15 +255,22 @@ func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 }
 
 func framePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
-	budgetLines, err := getBudgetLines(db)
+	budgetLines, err := getFrameLines(db)
 	if err != nil {
 		return fmt.Errorf("failed get scan budget lines information from database: %v", err)
 	}
-	if err := templates.ExecuteTemplate(w, "index.html", map[string]any{
-		"motd":        "You have very many money",
-		"others":      budgetLines,
-		"permissions": perms,
-		"loggedIn":    loggedIn,
+	committeeFrameLines, projectFrameLines, otherFrameLines, totalFrameLine, err := generateFrameLines(budgetLines)
+	if err != nil {
+		return fmt.Errorf("failed to generate frame budget lines: %v", err)
+	}
+	if err := templates.ExecuteTemplate(w, "frame.html", map[string]any{
+		"motd":                "You have very many money",
+		"committeeframelines": committeeFrameLines,
+		"projectframelines":   projectFrameLines,
+		"otherframelines":     otherFrameLines,
+		"totalframeline":      totalFrameLine,
+		"permissions":         perms,
+		"loggedIn":            loggedIn,
 	}); err != nil {
 		return fmt.Errorf("Could not render template: %w", err)
 	}
@@ -466,11 +481,11 @@ func getBudgetLinesBySecondaryCostCentreID(db *sql.DB, secondaryCostCentreID int
 	return budgetLines, nil
 }
 
-func getBudgetLines(db *sql.DB) ([]excel.BudgetLine, error) {
-	var budgetLinesGetStatementStatic = `
+func getFrameLines(db *sql.DB) ([]excel.BudgetLine, error) {
+	var frameLinesGetStatementStatic = `
 		SELECT 
-    		income,
-			expense,
+    		SUM(income),
+			SUM(expense),
 			secondary_cost_centres.name,
 			cost_centres.id,
 			cost_centres.name,
@@ -478,30 +493,31 @@ func getBudgetLines(db *sql.DB) ([]excel.BudgetLine, error) {
 		FROM budget_lines
 		JOIN secondary_cost_centres ON secondary_cost_centres.id = secondary_cost_centre_id
 		JOIN cost_centres ON secondary_cost_centres.cost_centre_id = cost_centres.id
-		ORDER BY cost_centre_id
+		GROUP BY cost_centres.id, cost_centres.name, cost_centres.type, secondary_cost_centres.name = 'Internt'
+		ORDER BY cost_centres.name
 	`
-	result, err := db.Query(budgetLinesGetStatementStatic)
+	result, err := db.Query(frameLinesGetStatementStatic)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get budgetlines from database: %v", err)
+		return nil, fmt.Errorf("failed to get framelines from database: %v", err)
 	}
-	var budgetLines []excel.BudgetLine
+	var frameLines []excel.BudgetLine
 	for result.Next() {
-		var budgetLine excel.BudgetLine
+		var frameLine excel.BudgetLine
 
 		err := result.Scan(
-			&budgetLine.BudgetLineIncome,
-			&budgetLine.BudgetLineExpense,
-			&budgetLine.SecondaryCostCentreName,
-			&budgetLine.CostCentreID,
-			&budgetLine.CostCentreName,
-			&budgetLine.CostCentreType,
+			&frameLine.BudgetLineIncome,
+			&frameLine.BudgetLineExpense,
+			&frameLine.SecondaryCostCentreName,
+			&frameLine.CostCentreID,
+			&frameLine.CostCentreName,
+			&frameLine.CostCentreType,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan budget line from query result: %v", err)
 		}
-		budgetLines = append(budgetLines, budgetLine)
+		frameLines = append(frameLines, frameLine)
 	}
-	return budgetLines, nil
+	return frameLines, nil
 }
 
 func getCostCentres(db *sql.DB) ([]excel.CostCentre, error) {
@@ -551,4 +567,52 @@ func splitCostCentresOnType(costCentres []excel.CostCentre) ([]excel.CostCentre,
 		}
 	}
 	return committeeCostCentres, projectCostCentres, otherCostCentres, nil
+}
+
+func generateFrameLines(frameLines []excel.BudgetLine) ([]FrameLine, []FrameLine, []FrameLine, FrameLine, error) {
+	var committeeFrameLines []FrameLine
+	var projectFrameLines []FrameLine
+	var otherFrameLines []FrameLine
+	var totalFrameLine FrameLine
+	totalFrameLine.FrameLineName = "Totalt"
+	var skippidi bool
+	for i, frameLine := range frameLines {
+		if skippidi == true {
+			skippidi = false
+			continue
+		}
+		frameLineIncome := frameLine.BudgetLineIncome
+		frameLineExpense := frameLine.BudgetLineExpense
+		frameLineName := frameLine.CostCentreName
+		frameLineInternal := 0
+		frameLineResult := 0
+
+		if i+1 < len(frameLines) && frameLines[i+1].CostCentreName == frameLineName {
+			frameLineIncome += frameLines[i+1].BudgetLineIncome
+			frameLineExpense += frameLines[i+1].BudgetLineExpense
+			frameLineInternal = frameLines[i+1].BudgetLineIncome + frameLines[i+1].BudgetLineExpense
+			skippidi = true
+		}
+
+		frameLineResult = frameLineIncome + frameLineExpense
+
+		reconstructedFrameLine := FrameLine{frameLineName, frameLineIncome, frameLineExpense, frameLineInternal, frameLineResult}
+
+		totalFrameLine.FrameLineIncome += frameLineIncome
+		totalFrameLine.FrameLineExpense += frameLineExpense
+		totalFrameLine.FrameLineInternal += frameLineInternal
+		totalFrameLine.FrameLineResult += frameLineResult
+
+		switch frameLine.CostCentreType {
+		case "committee":
+			committeeFrameLines = append(committeeFrameLines, reconstructedFrameLine)
+		case "project":
+			projectFrameLines = append(projectFrameLines, reconstructedFrameLine)
+		case "other":
+			otherFrameLines = append(otherFrameLines, reconstructedFrameLine)
+		default:
+			return nil, nil, nil, FrameLine{}, fmt.Errorf("faulty cost centre type found when splitting")
+		}
+	}
+	return committeeFrameLines, projectFrameLines, otherFrameLines, totalFrameLine, nil
 }

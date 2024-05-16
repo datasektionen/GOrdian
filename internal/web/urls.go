@@ -42,12 +42,19 @@ func Mount(mux *http.ServeMux, db *sql.DB) error {
 	mux.Handle("/logout", route(db, logoutPage))
 	mux.Handle("/admin", authRoute(db, adminPage, []string{"admin", "view-all"}))
 	mux.Handle("/admin/upload", authRoute(db, uploadPage, []string{"admin"}))
-	mux.Handle("/api/CostCentres", route(db, apiCostCentres))
-	mux.Handle("/api/SecondaryCostCentres", route(db, apiSecondaryCostCentre))
-	mux.Handle("/api/BudgetLines", route(db, apiBudgetLine))
+	mux.Handle("/api/CostCentres", cors(route(db, apiCostCentres)))
+	mux.Handle("/api/SecondaryCostCentres", cors(route(db, apiSecondaryCostCentre)))
+	mux.Handle("/api/BudgetLines", cors(route(db, apiBudgetLine)))
 	mux.Handle("/framebudget", authRoute(db, framePage, []string{}))
 
 	return nil
+}
+
+func cors(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Access-Control-Allow-Origin", "*")
+		h.ServeHTTP(w, r)
+	})
 }
 
 func add(x int, y int) int {

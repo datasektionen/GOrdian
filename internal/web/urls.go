@@ -591,6 +591,8 @@ func generateFrameLines(frameLines []excel.BudgetLine) ([]FrameLine, []FrameLine
 			frameLineIncome += frameLines[i+1].BudgetLineIncome
 			frameLineExpense += frameLines[i+1].BudgetLineExpense
 			frameLineInternal = frameLines[i+1].BudgetLineIncome + frameLines[i+1].BudgetLineExpense
+			//omg shmunguss-fix
+			frameLineInternal = (frameLineIncome + frameLineExpense) - frameLineInternal
 			skippidi = true
 		}
 

@@ -45,6 +45,7 @@ func Mount(mux *http.ServeMux, db *sql.DB) error {
 	mux.Handle("/api/CostCentres", route(db, apiCostCentres))
 	mux.Handle("/api/SecondaryCostCentres", route(db, apiSecondaryCostCentre))
 	mux.Handle("/api/BudgetLines", route(db, apiBudgetLine))
+	mux.Handle("/framebudget", authRoute(db, framePage, []string{}))
 
 	return nil
 }
@@ -230,6 +231,22 @@ func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 		"committees":  committeeCostCentres,
 		"projects":    projectCostCentres,
 		"others":      otherCostCentres,
+		"permissions": perms,
+		"loggedIn":    loggedIn,
+	}); err != nil {
+		return fmt.Errorf("Could not render template: %w", err)
+	}
+	return nil
+}
+
+func framePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
+	budgetLines, err := getBudgetLines(db)
+	if err != nil {
+		return fmt.Errorf("failed get scan budget lines information from database: %v", err)
+	}
+	if err := templates.ExecuteTemplate(w, "index.html", map[string]any{
+		"motd":        "You have very many money",
+		"others":      budgetLines,
 		"permissions": perms,
 		"loggedIn":    loggedIn,
 	}); err != nil {
@@ -433,6 +450,44 @@ func getBudgetLinesBySecondaryCostCentreID(db *sql.DB, secondaryCostCentreID int
 			&budgetLine.BudgetLineComment,
 			&budgetLine.BudgetLineAccount,
 			&budgetLine.SecondaryCostCentreID,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan budget line from query result: %v", err)
+		}
+		budgetLines = append(budgetLines, budgetLine)
+	}
+	return budgetLines, nil
+}
+
+func getBudgetLines(db *sql.DB) ([]excel.BudgetLine, error) {
+	var budgetLinesGetStatementStatic = `
+		SELECT 
+    		income,
+			expense,
+			secondary_cost_centres.name,
+			cost_centres.id,
+			cost_centres.name,
+			cost_centres.type
+		FROM budget_lines
+		JOIN secondary_cost_centres ON secondary_cost_centres.id = secondary_cost_centre_id
+		JOIN cost_centres ON secondary_cost_centres.cost_centre_id = cost_centres.id
+		ORDER BY cost_centre_id
+	`
+	result, err := db.Query(budgetLinesGetStatementStatic)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get budgetlines from database: %v", err)
+	}
+	var budgetLines []excel.BudgetLine
+	for result.Next() {
+		var budgetLine excel.BudgetLine
+
+		err := result.Scan(
+			&budgetLine.BudgetLineIncome,
+			&budgetLine.BudgetLineExpense,
+			&budgetLine.SecondaryCostCentreName,
+			&budgetLine.CostCentreID,
+			&budgetLine.CostCentreName,
+			&budgetLine.CostCentreType,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan budget line from query result: %v", err)

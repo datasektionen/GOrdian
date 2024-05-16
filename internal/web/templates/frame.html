@@ -7,9 +7,32 @@
     <h1 style="font-weight: bolder; font-size: 42px;">Rambudget</h1>
 </div>
 <div>
-    {{ .committeeframelines }}
-    {{ .projectframelines }}
-    {{ .otherframelines }}
+    Nämnder
+    <br>
+    {{range $_,$committeeframeline:= .committeeframelines}}
+    <div>
+        {{$committeframeline}}
+    </div>
+    <br>
+    {{end}}
+    Projekt
+    <br>
+    {{range $_,$projectframeline:= .projectframelines}}
+    <div>
+        {{$projectframeline}}
+    </div>
+    <br>
+    {{end}}
+    Övrigt
+    <br>
+    {{range $_,$otherframeline:= .otherframelines}}
+    <div>
+        {{$otherframeline}}
+    </div>
+    <br>
+    {{end}}
+    Totalt
+    <br>
     {{ .totalframeline }}
 </div>
 <br/>

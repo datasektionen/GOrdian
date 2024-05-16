@@ -486,7 +486,7 @@ func getFrameLines(db *sql.DB) ([]excel.BudgetLine, error) {
 		SELECT 
     		SUM(income),
 			SUM(expense),
-			secondary_cost_centres.name,
+			secondary_cost_centres.name = 'Internt',
 			cost_centres.id,
 			cost_centres.name,
 			cost_centres.type

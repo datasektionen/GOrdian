@@ -18,7 +18,7 @@
         <tr style="background-color: rgb(207,216,220) !important;">
             <th>Nämnder</th>
         </tr>
-            {{range $_, $$committeeframeline := .committeeframelines}}
+            {{range $_, $committeeframeline := .committeeframelines}}
                 <tr>
                     <td>
                         {{$committeeframeline[0]}}
@@ -40,7 +40,7 @@
         <tr style="background-color: rgb(207,216,220) !important;">
             <th>Projekt</th>
         </tr>
-        {{range $_,$projectframeline:= .projectframelines}}
+        {{range $_, $projectframeline:= .projectframelines}}
         <tr>
             <td>
                 {{$projectframeline[0]}}
@@ -62,7 +62,7 @@
         <tr style="background-color: rgb(207,216,220) !important;">
             <th>Övrigt</th>
         </tr>
-        {{range $_,$otherframeline:= .otherframelines}}
+        {{range $_, $otherframeline:= .otherframelines}}
         <tr>
             <td>
                 {{$otherframeline[0]}}

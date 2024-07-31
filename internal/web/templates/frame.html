@@ -20,11 +20,11 @@
         </tr>
         {{range $_, $committeeframeline := .committeeframelines}}
         <tr>
-            <td>{{$committeeframeline[0]}}</td>
-            <td style="text-align: right;">{{$committeeframeline[1]}}</td>
-            <td style="text-align: right;">{{$committeeframeline[2]}}</td>
-            <td style="text-align: right;">{{$committeeframeline[3]}}</td>
-            <td style="text-align: right;">{{$committeeframeline[4]}}</td>
+            <td>{{$committeeframeline 0}}</td>
+            <td style="text-align: right;">{{$committeeframeline 1}}</td>
+            <td style="text-align: right;">{{$committeeframeline 2}}</td>
+            <td style="text-align: right;">{{$committeeframeline 3}}</td>
+            <td style="text-align: right;">{{$committeeframeline 4}}</td>
         </tr>
         {{end}}
         <tr style="background-color: rgb(207,216,220) !important;">
@@ -32,11 +32,11 @@
         </tr>
         {{range $_, $projectframeline := .projectframelines}}
         <tr>
-            <td>{{$projectframeline[0]}}</td>
-            <td style="text-align: right;">{{$projectframeline[1]}}</td>
-            <td style="text-align: right;">{{$projectframeline[2]}}</td>
-            <td style="text-align: right;">{{$projectframeline[3]}}</td>
-            <td style="text-align: right;">{{$projectframeline[4]}}</td>
+            <td>{{$projectframeline 0}}</td>
+            <td style="text-align: right;">{{$projectframeline 1}}</td>
+            <td style="text-align: right;">{{$projectframeline 2}}</td>
+            <td style="text-align: right;">{{$projectframeline 3}}</td>
+            <td style="text-align: right;">{{$projectframeline 4}}</td>
         </tr>
         {{end}}
         <tr style="background-color: rgb(207,216,220) !important;">
@@ -44,22 +44,22 @@
         </tr>
         {{range $_, $otherframeline := .otherframelines}}
         <tr>
-            <td>{{$otherframeline[0]}}</td>
-            <td style="text-align: right;">{{$otherframeline[1]}}</td>
-            <td style="text-align: right;">{{$otherframeline[2]}}</td>
-            <td style="text-align: right;">{{$otherframeline[3]}}</td>
-            <td style="text-align: right;">{{$otherframeline[4]}}</td>
+            <td>{{$otherframeline 0}}</td>
+            <td style="text-align: right;">{{$otherframeline 1}}</td>
+            <td style="text-align: right;">{{$otherframeline 2}}</td>
+            <td style="text-align: right;">{{$otherframeline 3}}</td>
+            <td style="text-align: right;">{{$otherframeline 4}}</td>
         </tr>
         {{end}}
         <tr style="background-color: rgb(207,216,220) !important;">
             <th>Totalt</th>
         </tr>
         <tr>
-            <td>{{.totalframeline[0]}}</td>
-            <td style="text-align: right;">{{.totalframeline[1]}}</td>
-            <td style="text-align: right;">{{.totalframeline[2]}}</td>
-            <td style="text-align: right;">{{.totalframeline[3]}}</td>
-            <td style="text-align: right;">{{.totalframeline[4]}}</td>
+            <td>{{.totalframeline 0}}</td>
+            <td style="text-align: right;">{{.totalframeline 1}}</td>
+            <td style="text-align: right;">{{.totalframeline 2}}</td>
+            <td style="text-align: right;">{{.totalframeline 3}}</td>
+            <td style="text-align: right;">{{.totalframeline 4}}</td>
         </tr>
     </table>
     Nämnder

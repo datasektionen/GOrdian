@@ -9,6 +9,7 @@ import (
 	"github.com/datasektionen/GOrdian/internal/database"
 	"github.com/datasektionen/GOrdian/internal/excel"
 	"html/template"
+	"io"
 	"log/slog"
 	"math/rand"
 	"net/http"
@@ -242,6 +243,38 @@ func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 	if err != nil {
 		return fmt.Errorf("failed to split cost centres on type: %v", err)
 	}
+
+	//Mörkläggning av mottagningens budget
+	darkeningResp, err := http.Get("https://darkmode.datasektionen.se/")
+	if err != nil {
+		return fmt.Errorf("failed to get status from darkmode: %v", err)
+	}
+	defer darkeningResp.Body.Close()
+
+	if darkeningResp.StatusCode != http.StatusOK {
+		return fmt.Errorf("status error: %v", darkeningResp.StatusCode)
+	}
+
+	darkeningBody, err := io.ReadAll(darkeningResp.Body)
+	if err != nil {
+		return fmt.Errorf("read body: %v", err)
+	}
+
+	darkeningValue, err := strconv.ParseBool(string(darkeningBody))
+	if err != nil {
+		return fmt.Errorf("failed to parse bool: %v", err)
+	}
+
+	if darkeningValue {
+		for index, committeeCostCentre := range committeeCostCentres {
+			if committeeCostCentre.CostCentreName == "Mottagningen" {
+				committeeCostCentres = append(committeeCostCentres[:index], committeeCostCentres[index+1:]...)
+				break
+			}
+		}
+	}
+	//end of mörkläggning
+
 	if err := templates.ExecuteTemplate(w, "index.html", map[string]any{
 		"motd":        motdGenerator(),
 		"committees":  committeeCostCentres,

@@ -17,6 +17,10 @@
         </tr>
         <tr style="background-color: rgb(207,216,220) !important;">
             <th>Nämnder</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
         </tr>
         {{range $_, $committeeframeline := .committeeframelines}}
         <tr>
@@ -29,6 +33,10 @@
         {{end}}
         <tr style="background-color: rgb(207,216,220) !important;">
             <th>Projekt</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
         </tr>
         {{range $_, $projectframeline := .projectframelines}}
         <tr>
@@ -41,6 +49,10 @@
         {{end}}
         <tr style="background-color: rgb(207,216,220) !important;">
             <th>Övrigt</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
         </tr>
         {{range $_, $otherframeline := .otherframelines}}
         <tr>
@@ -53,6 +65,10 @@
         {{end}}
         <tr style="background-color: rgb(207,216,220) !important;">
             <th>Totalt</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
         </tr>
         <tr>
             <td>{{.totalframeline.FrameLineName}}</td>
@@ -62,27 +78,6 @@
             <td style="text-align: right;">{{.totalframeline.FrameLineResult}}</td>
         </tr>
     </table>
-    Nämnder
-    <br>
-    {{range $_, $committeeframeline := .committeeframelines}}
-    <div>{{$committeeframeline}}</div>
-    <br>
-    {{end}}
-    Projekt
-    <br>
-    {{range $_, $projectframeline := .projectframelines}}
-    <div>{{$projectframeline}}</div>
-    <br>
-    {{end}}
-    Övrigt
-    <br>
-    {{range $_, $otherframeline := .otherframelines}}
-    <div>{{$otherframeline}}</div>
-    <br>
-    {{end}}
-    Totalt
-    <br>
-    {{.totalframeline}}
 </div>
 <br><br><br><br><br><br><br>
 <footer class="footer-toolbar" style="align-items: center; text-align: center;">

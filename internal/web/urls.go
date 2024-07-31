@@ -247,22 +247,23 @@ func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 	//Mörkläggning av mottagningens budget
 	darkeningResp, err := http.Get("https://darkmode.datasektionen.se/")
 	if err != nil {
-		return fmt.Errorf("failed to get status from darkmode: %v", err)
+		slog.Error("Failed to get status from darkmode", "error", err)
+		return fmt.Errorf(": %v", err)
 	}
 	defer darkeningResp.Body.Close()
 
 	if darkeningResp.StatusCode != http.StatusOK {
-		return fmt.Errorf("status error: %v", darkeningResp.StatusCode)
+		slog.Error("Status error from darkmode", "error", darkeningResp.StatusCode)
 	}
 
 	darkeningBody, err := io.ReadAll(darkeningResp.Body)
 	if err != nil {
-		return fmt.Errorf("read body: %v", err)
+		slog.Error("Failed to read body", "error", err)
 	}
 
 	darkeningValue, err := strconv.ParseBool(string(darkeningBody))
 	if err != nil {
-		return fmt.Errorf("failed to parse bool: %v", err)
+		slog.Error("Failed to parse bool", "error", err)
 	}
 
 	if darkeningValue {

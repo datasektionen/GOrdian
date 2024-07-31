@@ -7,12 +7,17 @@
     <h1 style="font-weight: bolder; font-size: 42px;">Admin</h1>
 </div>
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+    <br><br>
     <p>Ladda upp din budget här!</p>
     <p>Den ska vara i xlsx format, annars så dör du</p>
     <form action="/admin/upload" method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; align-items: center;">
         <input type="file" name="budgetFile" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" style="margin-bottom: 10px;">
         <input type="submit" style="margin-top: 10px;">
     </form>
+    <br><br>
+    <p>Filen du laddar upp måste följa ett specifikt format</p>
+    <p>Ladda ner exempelbudget nedan</p>
+    <a href="/test/Budget_2024.xlsx" download="Template">Ladda ner</a>
 </div>
 <footer class="footer-toolbar" style="align-items: center; text-align: center;">
     <p>{{.motd}} © 2024 GOrdian</p>

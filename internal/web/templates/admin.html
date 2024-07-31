@@ -10,8 +10,10 @@
     <p>Ladda upp din budget här!</p>
     <p>Den ska vara i xlsx format, annars så dör du</p>
     <form action="/admin/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="budgetFile" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-        <input type="submit">
+        <div style="align-items: center; text-align: center; align-content: center">
+            <input type="file" name="budgetFile" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+            <input type="submit">
+        </div>
     </form>
 </div>
 <footer class="footer-toolbar" style="align-items: center; text-align: center;">

@@ -6,9 +6,9 @@
 <div style="background-color: #78909C !important; color: white; padding: 20px;">
     <h1 style="font-weight: bolder; font-size: 42px;">Admin</h1>
 </div>
-<div>
-    Ladda upp din budget här!
-    Den ska vara i xlsx format, annars så dör du
+<div style="align-items: center; text-align: center;">
+    <p>Ladda upp din budget här!</p>
+    <p>Den ska vara i xlsx format, annars så dör du</p>
     <form action="/admin/upload" method="post" enctype="multipart/form-data">
         <input type="file" name="budgetFile" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
         <input type="submit">

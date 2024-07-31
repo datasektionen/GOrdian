@@ -18,127 +18,75 @@
         <tr style="background-color: rgb(207,216,220) !important;">
             <th>Nämnder</th>
         </tr>
-            {{range $_, $committeeframeline := .committeeframelines}}
-                <tr>
-                    <td>
-                        {{$committeeframeline[0]}}
-                    </td>
-                    <td>
-                        {{$committeeframeline[1]}}
-                    </td>
-                    <td>
-                        {{$committeeframeline[2]}}
-                    </td>
-                    <td>
-                        {{$committeeframeline[3]}}
-                    </td>
-                    <td>
-                        {{$committeeframeline[4]}}
-                    </td>
-                </tr>
-            {{end}}
+        {{range $_, $committeeframeline := .committeeframelines}}
+        <tr>
+            <td>{{$committeeframeline[0]}}</td>
+            <td style="text-align: right;">{{$committeeframeline[1]}}</td>
+            <td style="text-align: right;">{{$committeeframeline[2]}}</td>
+            <td style="text-align: right;">{{$committeeframeline[3]}}</td>
+            <td style="text-align: right;">{{$committeeframeline[4]}}</td>
+        </tr>
+        {{end}}
         <tr style="background-color: rgb(207,216,220) !important;">
             <th>Projekt</th>
         </tr>
-        {{range $_, $projectframeline:= .projectframelines}}
+        {{range $_, $projectframeline := .projectframelines}}
         <tr>
-            <td>
-                {{$projectframeline[0]}}
-            </td>
-            <td>
-                {{$projectframeline[1]}}
-            </td>
-            <td>
-                {{$projectframeline[2]}}
-            </td>
-            <td>
-                {{$projectframeline[3]}}
-            </td>
-            <td>
-                {{$projectframeline[4]}}
-            </td>
+            <td>{{$projectframeline[0]}}</td>
+            <td style="text-align: right;">{{$projectframeline[1]}}</td>
+            <td style="text-align: right;">{{$projectframeline[2]}}</td>
+            <td style="text-align: right;">{{$projectframeline[3]}}</td>
+            <td style="text-align: right;">{{$projectframeline[4]}}</td>
         </tr>
         {{end}}
         <tr style="background-color: rgb(207,216,220) !important;">
             <th>Övrigt</th>
         </tr>
-        {{range $_, $otherframeline:= .otherframelines}}
+        {{range $_, $otherframeline := .otherframelines}}
         <tr>
-            <td>
-                {{$otherframeline[0]}}
-            </td>
-            <td>
-                {{$otherframeline[1]}}
-            </td>
-            <td>
-                {{$otherframeline[2]}}
-            </td>
-            <td>
-                {{$otherframeline[3]}}
-            </td>
-            <td>
-                {{$otherframeline[4]}}
-            </td>
+            <td>{{$otherframeline[0]}}</td>
+            <td style="text-align: right;">{{$otherframeline[1]}}</td>
+            <td style="text-align: right;">{{$otherframeline[2]}}</td>
+            <td style="text-align: right;">{{$otherframeline[3]}}</td>
+            <td style="text-align: right;">{{$otherframeline[4]}}</td>
         </tr>
         {{end}}
         <tr style="background-color: rgb(207,216,220) !important;">
             <th>Totalt</th>
         </tr>
         <tr>
-            <td>
-                {{.totalframeline[0]}}
-            </td>
-            <td>
-                {{.totalframeline[1]}}
-            </td>
-            <td>
-                {{.totalframeline[2]}}
-            </td>
-            <td>
-                {{.totalframeline[3]}}
-            </td>
-            <td>
-                {{.totalframeline[4]}}
-            </td>
+            <td>{{.totalframeline[0]}}</td>
+            <td style="text-align: right;">{{.totalframeline[1]}}</td>
+            <td style="text-align: right;">{{.totalframeline[2]}}</td>
+            <td style="text-align: right;">{{.totalframeline[3]}}</td>
+            <td style="text-align: right;">{{.totalframeline[4]}}</td>
         </tr>
     </table>
     Nämnder
     <br>
-    {{range $_,$committeeframeline:= .committeeframelines}}
-    <div>
-        {{$committeeframeline}}
-    </div>
+    {{range $_, $committeeframeline := .committeeframelines}}
+    <div>{{$committeeframeline}}</div>
     <br>
     {{end}}
     Projekt
     <br>
-    {{range $_,$projectframeline:= .projectframelines}}
-    <div>
-        {{$projectframeline}}
-    </div>
+    {{range $_, $projectframeline := .projectframelines}}
+    <div>{{$projectframeline}}</div>
     <br>
     {{end}}
     Övrigt
     <br>
-    {{range $_,$otherframeline:= .otherframelines}}
-    <div>
-        {{$otherframeline}}
-    </div>
+    {{range $_, $otherframeline := .otherframelines}}
+    <div>{{$otherframeline}}</div>
     <br>
     {{end}}
     Totalt
     <br>
-    {{ .totalframeline }}
+    {{.totalframeline}}
 </div>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+<br><br><br><br><br><br><br>
 <footer class="footer-toolbar" style="align-items: center; text-align: center;">
-    <p>{{ .motd }} © 2024 GOrdian</p>
+    <p>{{.motd}} © 2024 GOrdian</p>
     Budgetsystemet är skrivet av <a href="https://github.com/DouglasFischer">Douglas Fischer</a>
 </footer>
 </body>

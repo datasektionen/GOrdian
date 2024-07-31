@@ -263,12 +263,26 @@ func framePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 	if err != nil {
 		return fmt.Errorf("failed to generate frame budget lines: %v", err)
 	}
+
+	// Convert FrameLine to a slice of strings for easier template processing
+	convertToSlice := func(f FrameLine) []string {
+		return []string{f.FrameLineName, strconv.Itoa(f.FrameLineIncome), strconv.Itoa(f.FrameLineExpense), strconv.Itoa(f.FrameLineInternal), strconv.Itoa(f.FrameLineResult)} // Adjust according to actual fields in FrameLine
+	}
+
+	convertSliceOfFrameLine := func(f []FrameLine) [][]string {
+		result := make([][]string, len(f))
+		for i, line := range f {
+			result[i] = convertToSlice(line)
+		}
+		return result
+	}
+
 	if err := templates.ExecuteTemplate(w, "frame.html", map[string]any{
 		"motd":                "You have very many money",
-		"committeeframelines": committeeFrameLines,
-		"projectframelines":   projectFrameLines,
-		"otherframelines":     otherFrameLines,
-		"totalframeline":      totalFrameLine,
+		"committeeframelines": convertSliceOfFrameLine(committeeFrameLines),
+		"projectframelines":   convertSliceOfFrameLine(projectFrameLines),
+		"otherframelines":     convertSliceOfFrameLine(otherFrameLines),
+		"totalframeline":      convertToSlice(totalFrameLine),
 		"permissions":         perms,
 		"loggedIn":            loggedIn,
 	}); err != nil {

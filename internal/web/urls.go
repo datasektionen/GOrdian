@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"github.com/datasektionen/GOrdian/internal/config"
 	"github.com/datasektionen/GOrdian/internal/database"
+	"github.com/datasektionen/GOrdian/internal/excel"
 	"html/template"
 	"log/slog"
+	"math/rand"
 	"net/http"
 	"strconv"
-
-	"github.com/datasektionen/GOrdian/internal/excel"
 )
 
 type FrameLine struct {
@@ -196,6 +196,7 @@ func apiBudgetLine(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 
 func adminPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
 	if err := templates.ExecuteTemplate(w, "admin.html", map[string]any{
+		"motd":        motdGenerator(),
 		"permissions": perms,
 		"loggedIn":    loggedIn,
 	}); err != nil {
@@ -242,7 +243,7 @@ func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 		return fmt.Errorf("failed to split cost centres on type: %v", err)
 	}
 	if err := templates.ExecuteTemplate(w, "index.html", map[string]any{
-		"motd":        "You have very many money",
+		"motd":        motdGenerator(),
 		"committees":  committeeCostCentres,
 		"projects":    projectCostCentres,
 		"others":      otherCostCentres,
@@ -264,7 +265,7 @@ func framePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 		return fmt.Errorf("failed to generate frame budget lines: %v", err)
 	}
 	if err := templates.ExecuteTemplate(w, "frame.html", map[string]any{
-		"motd":                "You have very many money",
+		"motd":                motdGenerator(),
 		"committeeframelines": committeeFrameLines,
 		"projectframelines":   projectFrameLines,
 		"otherframelines":     otherFrameLines,
@@ -321,6 +322,7 @@ func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []
 	}
 
 	if err := templates.ExecuteTemplate(w, "costcentre.html", map[string]any{
+		"motd": motdGenerator(),
 		"secondaryCostCentresWithBudgetLinesList": secondaryCostCentresWithBudgetLinesList,
 		"costCentre":             costCentre,
 		"costCentreTotalIncome":  costCentreTotalIncome,
@@ -615,4 +617,16 @@ func generateFrameLines(frameLines []excel.BudgetLine) ([]FrameLine, []FrameLine
 		}
 	}
 	return committeeFrameLines, projectFrameLines, otherFrameLines, totalFrameLine, nil
+}
+
+func motdGenerator() string {
+	options := []string{
+		"You have very many money:",
+		"Sjunde gången gillt:",
+		"Kassörens bästa vän:",
+		"Brought to you by FIPL consulting:",
+		"Kom på hackerkvällarna!",
+		"12345690,+"}
+	randomIndex := rand.Intn(len(options))
+	return options[randomIndex]
 }

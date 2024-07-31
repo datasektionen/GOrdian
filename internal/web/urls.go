@@ -245,7 +245,7 @@ func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 	}
 
 	//Mörkläggning av mottagningens budget
-	darkeningResp, err := http.Get("https://darkmode.datasektionen.se/")
+	darkeningResp, err := http.Get("https://cashflow.datasektionen.se/")
 	if err != nil {
 		slog.Error("Failed to get status from darkmode", "error", err)
 		return fmt.Errorf(": %v", err)

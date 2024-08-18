@@ -525,15 +525,15 @@ func getFrameLines(db *sql.DB) ([]excel.BudgetLine, error) {
 		SELECT 
     		SUM(income),
 			SUM(expense),
-			secondary_cost_centres.name = 'Internt',
+			secondary_cost_centres.name ILIKE '%Internt%',
 			cost_centres.id,
 			cost_centres.name,
 			cost_centres.type
 		FROM budget_lines
 		JOIN secondary_cost_centres ON secondary_cost_centres.id = secondary_cost_centre_id
 		JOIN cost_centres ON secondary_cost_centres.cost_centre_id = cost_centres.id
-		GROUP BY cost_centres.id, cost_centres.name, cost_centres.type, secondary_cost_centres.name = 'Internt'
-		ORDER BY cost_centres.name, secondary_cost_centres.name = 'Internt'
+		GROUP BY cost_centres.id, cost_centres.name, cost_centres.type, secondary_cost_centres.name ILIKE '%Internt%'
+		ORDER BY cost_centres.name, secondary_cost_centres.name ILIKE '%Internt%'
 	`
 	result, err := db.Query(frameLinesGetStatementStatic)
 	if err != nil {

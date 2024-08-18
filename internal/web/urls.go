@@ -28,7 +28,7 @@ const (
 	loginSessionCookieName = "login-session"
 )
 
-//go:embed templates/*.html
+//go:embed templates/*.gohtml
 var templatesFS embed.FS
 
 //go:embed static/*
@@ -39,7 +39,7 @@ var templates *template.Template
 func Mount(mux *http.ServeMux, db *sql.DB) error {
 	var err error
 	tokenURL := config.GetEnv().LoginURL + "/login?callback=" + config.GetEnv().ServerURL + "/token?token="
-	templates, err = template.New("").Funcs(map[string]any{"formatMoney": formatMoney, "add": add, "sliceContains": sliceContains}).ParseFS(templatesFS, "templates/*.html")
+	templates, err = template.New("").Funcs(map[string]any{"formatMoney": formatMoney, "add": add, "sliceContains": sliceContains}).ParseFS(templatesFS, "templates/*.gohtml")
 	if err != nil {
 		return err
 	}
@@ -196,7 +196,7 @@ func apiBudgetLine(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 }
 
 func adminPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
-	if err := templates.ExecuteTemplate(w, "admin.html", map[string]any{
+	if err := templates.ExecuteTemplate(w, "admin.gohtml", map[string]any{
 		"motd":        motdGenerator(),
 		"permissions": perms,
 		"loggedIn":    loggedIn,
@@ -276,7 +276,7 @@ func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 	}
 	//end of mörkläggning
 
-	if err := templates.ExecuteTemplate(w, "index.html", map[string]any{
+	if err := templates.ExecuteTemplate(w, "index.gohtml", map[string]any{
 		"motd":        motdGenerator(),
 		"committees":  committeeCostCentres,
 		"projects":    projectCostCentres,
@@ -298,7 +298,7 @@ func framePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 	if err != nil {
 		return fmt.Errorf("failed to generate frame budget lines: %v", err)
 	}
-	if err := templates.ExecuteTemplate(w, "frame.html", map[string]any{
+	if err := templates.ExecuteTemplate(w, "frame.gohtml", map[string]any{
 		"motd":                  motdGenerator(),
 		"committeeframelines":   committeeFrameLines,
 		"projectframelines":     projectFrameLines,
@@ -358,7 +358,7 @@ func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []
 		return fmt.Errorf("failed calculate cost centre values: %v", err)
 	}
 
-	if err := templates.ExecuteTemplate(w, "costcentre.html", map[string]any{
+	if err := templates.ExecuteTemplate(w, "costcentre.gohtml", map[string]any{
 		"motd": motdGenerator(),
 		"secondaryCostCentresWithBudgetLinesList": secondaryCostCentresWithBudgetLinesList,
 		"costCentre":             costCentre,

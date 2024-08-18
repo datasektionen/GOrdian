@@ -195,7 +195,7 @@ func ReadExcel(fileReader io.Reader) ([]CostCentre, []SecondaryCostCentre, []Bud
 		}
 	}
 	if omegaError != nil {
-		return nil, nil, nil, fmt.Errorf("failed to sanitize budget value(s): \n %w", omegaError)
+		return nil, nil, nil, fmt.Errorf("failed to sanitize budget value(s): \n%w", omegaError)
 	}
 	return costCentres, secondaryCostCentres, budgetLines, nil
 }

@@ -6,10 +6,97 @@ Live at [budget.datasektionen.se](https://budget.datasektionen.se).
 
 # API
 
-**API documentation** can be found here: **TBA**
+**API documentation** can be found here: **Look down**
+
+## List all Cost Centres
+<details>
+    <summary>
+        <code>GET</code> <code><b>/api/CostCentres</b></code> <code>(gets all CCs)</code>
+    </summary>
+
+### Parameters
+
+None
+
+### Responses
+
+```JSON
+[
+  {
+    "CostCentreID":21,
+    "CostCentreName":"Ada",
+    "CostCentreType":"committee"
+  }
+]
+```
+
+</details>
+
+## List all Secondary Cost Centres of a Cost Centre
+<details>
+    <summary>
+        <code>GET</code> <code><b>/api/SecondaryCostCentres?id={CCid}</b></code> <code>(gets all SCC given CC id)</code>
+    </summary>
+
+### Parameters
+
+> | name   |  type     | data type      | description                      |
+> |--------|-----------|----------------|----------------------------------|
+> | `CCid` |  required | int ($int64)   | The id of a specific Cost Centre |
+
+### Responses
+
+```JSON
+[
+  {
+    "CostCentreID":1,
+    "SecondaryCostCentreID":3,
+    "SecondaryCostCentreName":"Allmänt"
+  }
+]
+```
+
+</details>
+
+## List all Budget Lines of a Secondary Cost Centre
+<details>
+    <summary>
+        <code>GET</code> <code><b>/api/BudgetLines?id={SCCid}</b></code> <code>(gets all Budget Lines given SCC id)</code>
+    </summary>
+
+### Parameters
+
+> | name    |  type     | data type      | description                                |
+> |---------|-----------|----------------|--------------------------------------------|
+> | `SCCid` |  required | int ($int64)   | The id of a specific Secondary Cost Centre |
+
+### Responses
+
+```JSON
+[
+  {"SecondaryCostCentreID":3,
+    "BudgetLineID":33,
+    "BudgetLineName":"Mat till planeringsmöten",
+    "BudgetLineAccount":"4029",
+    "BudgetLineIncome":0,
+    "BudgetLineExpense":-4400,
+    "BudgetLineComment":"Ny för i år, 4"
+  }
+]
+```
+</details>
 
 # Local
-dunno lol
+- Clone repo
+- Install docker
+- Install PostgreSQL
+- Create database and user in psql according to env.go
+- Make user superuser
+- Schemify database with .sql file
+- Ask dsys for GOrdian token
+- Ask dsys for pls access
+- Create dockerimage
+- Run dockerimage
 
 # Entities
 

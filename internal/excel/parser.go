@@ -1,6 +1,7 @@
 package excel
 
 import (
+	"errors"
 	"fmt"
 	"github.com/xuri/excelize/v2"
 	"io"
@@ -68,6 +69,8 @@ func ReadExcel(fileReader io.Reader) ([]CostCentre, []SecondaryCostCentre, []Bud
 
 	var secondaryCostCentreIDCounter = 0
 	var budgetLineIDCounter = 0
+
+	var omegaError error
 
 	//[1:] excludes the first sheet
 	for sheetIndex, sheetName := range sheets[1:] {
@@ -142,12 +145,14 @@ func ReadExcel(fileReader io.Reader) ([]CostCentre, []SecondaryCostCentre, []Bud
 
 					budgetLineIncome, err := sanitizeBudgetValue(budgetLineIncomeString, secondaryCostCentre)
 					if err != nil {
-						return nil, nil, nil, fmt.Errorf("failed to sanitize budget value: %v", err)
+						omegaError = errors.Join(omegaError, err)
+						//return nil, nil, nil, fmt.Errorf("failed to sanitize budget value: %v", err)
 					}
 
 					budgetLineExpense, err := sanitizeBudgetValue(budgetLineExpenseString, secondaryCostCentre)
 					if err != nil {
-						return nil, nil, nil, fmt.Errorf("failed to sanitize budget value: %v", err)
+						omegaError = errors.Join(omegaError, err)
+						//return nil, nil, nil, fmt.Errorf("failed to sanitize budget value: %v", err)
 					}
 
 					//create BudgetLine object
@@ -188,6 +193,9 @@ func ReadExcel(fileReader io.Reader) ([]CostCentre, []SecondaryCostCentre, []Bud
 			}
 			secondaryCostCentreIDCounter++
 		}
+	}
+	if omegaError != nil {
+		return nil, nil, nil, fmt.Errorf("failed to sanitize budget value(s): %w", omegaError)
 	}
 	return costCentres, secondaryCostCentres, budgetLines, nil
 }

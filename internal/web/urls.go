@@ -294,18 +294,21 @@ func framePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 	if err != nil {
 		return fmt.Errorf("failed get scan budget lines information from database: %v", err)
 	}
-	committeeFrameLines, projectFrameLines, otherFrameLines, totalFrameLine, err := generateFrameLines(budgetLines)
+	committeeFrameLines, projectFrameLines, otherFrameLines, totalFrameLine, sumCommitteeFrameLine, sumProjectFrameLine, sumOtherFrameLine, err := generateFrameLines(budgetLines)
 	if err != nil {
 		return fmt.Errorf("failed to generate frame budget lines: %v", err)
 	}
 	if err := templates.ExecuteTemplate(w, "frame.html", map[string]any{
-		"motd":                motdGenerator(),
-		"committeeframelines": committeeFrameLines,
-		"projectframelines":   projectFrameLines,
-		"otherframelines":     otherFrameLines,
-		"totalframeline":      totalFrameLine,
-		"permissions":         perms,
-		"loggedIn":            loggedIn,
+		"motd":                  motdGenerator(),
+		"committeeframelines":   committeeFrameLines,
+		"projectframelines":     projectFrameLines,
+		"otherframelines":       otherFrameLines,
+		"totalframeline":        totalFrameLine,
+		"sumcommitteeframeline": sumCommitteeFrameLine,
+		"sumprojectframeline":   sumProjectFrameLine,
+		"sumotherframeline":     sumOtherFrameLine,
+		"permissions":           perms,
+		"loggedIn":              loggedIn,
 	}); err != nil {
 		return fmt.Errorf("Could not render template: %w", err)
 	}
@@ -605,12 +608,20 @@ func splitCostCentresOnType(costCentres []excel.CostCentre) ([]excel.CostCentre,
 	return committeeCostCentres, projectCostCentres, otherCostCentres, nil
 }
 
-func generateFrameLines(frameLines []excel.BudgetLine) ([]FrameLine, []FrameLine, []FrameLine, FrameLine, error) {
+func generateFrameLines(frameLines []excel.BudgetLine) ([]FrameLine, []FrameLine, []FrameLine, FrameLine, FrameLine, FrameLine, FrameLine, error) {
 	var committeeFrameLines []FrameLine
 	var projectFrameLines []FrameLine
 	var otherFrameLines []FrameLine
 	var totalFrameLine FrameLine
+	var sumCommitteeFrameLine FrameLine
+	var sumProjectFrameLine FrameLine
+	var sumOtherFrameLine FrameLine
+
 	totalFrameLine.FrameLineName = "Totalt"
+	sumCommitteeFrameLine.FrameLineName = "Summa nämnder"
+	sumProjectFrameLine.FrameLineName = "Summa projekt"
+	sumOtherFrameLine.FrameLineName = "Summa övrigt"
+
 	var skippidi bool
 	for i, frameLine := range frameLines {
 		if skippidi == true {
@@ -647,10 +658,32 @@ func generateFrameLines(frameLines []excel.BudgetLine) ([]FrameLine, []FrameLine
 		case "other":
 			otherFrameLines = append(otherFrameLines, reconstructedFrameLine)
 		default:
-			return nil, nil, nil, FrameLine{}, fmt.Errorf("faulty cost centre type found when splitting")
+			return nil, nil, nil, FrameLine{}, FrameLine{}, FrameLine{}, FrameLine{}, fmt.Errorf("faulty cost centre type found when splitting")
 		}
 	}
-	return committeeFrameLines, projectFrameLines, otherFrameLines, totalFrameLine, nil
+
+	for _, committeeFrameLine := range committeeFrameLines {
+		sumCommitteeFrameLine.FrameLineIncome += committeeFrameLine.FrameLineIncome
+		sumCommitteeFrameLine.FrameLineExpense += committeeFrameLine.FrameLineExpense
+		sumCommitteeFrameLine.FrameLineInternal += committeeFrameLine.FrameLineInternal
+		sumCommitteeFrameLine.FrameLineResult += committeeFrameLine.FrameLineResult
+	}
+
+	for _, ProjectFrameLine := range projectFrameLines {
+		sumProjectFrameLine.FrameLineIncome += ProjectFrameLine.FrameLineIncome
+		sumProjectFrameLine.FrameLineExpense += ProjectFrameLine.FrameLineExpense
+		sumProjectFrameLine.FrameLineInternal += ProjectFrameLine.FrameLineInternal
+		sumProjectFrameLine.FrameLineResult += ProjectFrameLine.FrameLineResult
+	}
+
+	for _, OtherFrameLine := range otherFrameLines {
+		sumOtherFrameLine.FrameLineIncome += OtherFrameLine.FrameLineIncome
+		sumOtherFrameLine.FrameLineExpense += OtherFrameLine.FrameLineExpense
+		sumOtherFrameLine.FrameLineInternal += OtherFrameLine.FrameLineInternal
+		sumOtherFrameLine.FrameLineResult += OtherFrameLine.FrameLineResult
+	}
+
+	return committeeFrameLines, projectFrameLines, otherFrameLines, totalFrameLine, sumCommitteeFrameLine, sumProjectFrameLine, sumOtherFrameLine, nil
 }
 
 func motdGenerator() string {

@@ -110,6 +110,51 @@
                     {{formatMoney .totalframeline.FrameLineResult}} kr
                 </td>
             </tr>
+            <tr>
+                <td style="white-space: wrap; color:black;">{{.sumcommitteeframeline.FrameLineName}}</td>
+                <td style="color: {{if gt .sumcommitteeframeline.FrameLineIncome 0}} #4CAF50 {{else if lt .sumcommitteeframeline.FrameLineIncome 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    {{formatMoney .sumcommitteeframeline.FrameLineIncome}} kr
+                </td>
+                <td style="color: {{if gt .sumcommitteeframeline.FrameLineExpense 0}} #4CAF50 {{else if lt .sumcommitteeframeline.FrameLineExpense 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    {{formatMoney .sumcommitteeframeline.FrameLineExpense}} kr
+                </td>
+                <td style="color: {{if gt .sumcommitteeframeline.FrameLineInternal 0}} #4CAF50 {{else if lt .sumcommitteeframeline.FrameLineInternal 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    {{formatMoney .sumcommitteeframeline.FrameLineInternal}} kr
+                </td>
+                <td style="color: {{if gt .sumcommitteeframeline.FrameLineResult 0}} #4CAF50 {{else if lt .sumcommitteeframeline.FrameLineResult 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    {{formatMoney .sumcommitteeframeline.FrameLineResult}} kr
+                </td>
+            </tr>
+            <tr>
+                <td style="white-space: wrap; color:black;">{{.sumprojectframeline.FrameLineName}}</td>
+                <td style="color: {{if gt .sumprojectframeline.FrameLineIncome 0}} #4CAF50 {{else if lt .sumprojectframeline.FrameLineIncome 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    {{formatMoney .sumprojectframeline.FrameLineIncome}} kr
+                </td>
+                <td style="color: {{if gt .sumprojectframeline.FrameLineExpense 0}} #4CAF50 {{else if lt .sumprojectframeline.FrameLineExpense 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    {{formatMoney .sumprojectframeline.FrameLineExpense}} kr
+                </td>
+                <td style="color: {{if gt .sumprojectframeline.FrameLineInternal 0}} #4CAF50 {{else if lt .sumprojectframeline.FrameLineInternal 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    {{formatMoney .sumprojectframeline.FrameLineInternal}} kr
+                </td>
+                <td style="color: {{if gt .sumprojectframeline.FrameLineResult 0}} #4CAF50 {{else if lt .sumprojectframeline.FrameLineResult 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    {{formatMoney .sumprojectframeline.FrameLineResult}} kr
+                </td>
+            </tr>
+            <tr>
+                <td style="white-space: wrap; color:black;">{{.sumothertframeline.FrameLineName}}</td>
+                <td style="color: {{if gt .sumothertframeline.FrameLineIncome 0}} #4CAF50 {{else if lt .sumothertframeline.FrameLineIncome 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    {{formatMoney .sumothertframeline.FrameLineIncome}} kr
+                </td>
+                <td style="color: {{if gt .sumothertframeline.FrameLineExpense 0}} #4CAF50 {{else if lt .sumothertframeline.FrameLineExpense 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    {{formatMoney .sumothertframeline.FrameLineExpense}} kr
+                </td>
+                <td style="color: {{if gt .sumothertframeline.FrameLineInternal 0}} #4CAF50 {{else if lt .sumothertframeline.FrameLineInternal 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    {{formatMoney .sumothertframeline.FrameLineInternal}} kr
+                </td>
+                <td style="color: {{if gt .sumothertframeline.FrameLineResult 0}} #4CAF50 {{else if lt .sumothertframeline.FrameLineResult 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    {{formatMoney .sumothertframeline.FrameLineResult}} kr
+                </td>
+            </tr>
         </table>
     </div>
 </div>

@@ -634,6 +634,9 @@ func generateFrameLines(frameLines []excel.BudgetLine) ([]FrameLine, []FrameLine
 		frameLineInternal := 0
 		frameLineResult := 0
 
+		// each CC appears twice, once for internal costs, once for the rest
+		// both are handled i and i+1
+		// skippidi makes sure that the loop incements by two
 		if i+1 < len(frameLines) && frameLines[i+1].CostCentreName == frameLineName {
 			frameLineIncome += frameLines[i+1].BudgetLineIncome
 			frameLineExpense += frameLines[i+1].BudgetLineExpense

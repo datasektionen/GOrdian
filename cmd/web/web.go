@@ -16,7 +16,7 @@ func main() {
 		log.Printf("error accessing GOrdian database: %v", err)
 	}
 
-	dbCF, err := database.Connect(envVar.PsqlconnStringGOrdian)
+	dbCF, err := database.Connect(envVar.PsqlconnStringCashflow)
 	if err != nil {
 		log.Printf("error accessing Cashflow database: %v", err)
 	}

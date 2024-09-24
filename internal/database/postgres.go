@@ -3,16 +3,10 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"github.com/datasektionen/GOrdian/internal/config"
 	_ "github.com/lib/pq"
 )
 
-func Connect() (*sql.DB, error) {
-
-	envVar := config.GetEnv()
-
-	psqlconnString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		envVar.DBHost, envVar.DBPort, envVar.DBUser, envVar.DBPass, envVar.DBName)
+func Connect(psqlconnString string) (*sql.DB, error) {
 
 	db, err := sql.Open("postgres", psqlconnString)
 	if err != nil {

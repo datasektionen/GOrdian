@@ -24,6 +24,11 @@ type FrameLine struct {
 	FrameLineResult   int
 }
 
+type Databases struct {
+	DBCF *sql.DB
+	DBGO *sql.DB
+}
+
 const (
 	loginSessionCookieName = "login-session"
 )
@@ -36,7 +41,7 @@ var staticFiles embed.FS
 
 var templates *template.Template
 
-func Mount(mux *http.ServeMux, db *sql.DB) error {
+func Mount(mux *http.ServeMux, databases Databases) error {
 	var err error
 	tokenURL := config.GetEnv().LoginURL + "/login?callback=" + config.GetEnv().ServerURL + "/token?token="
 	templates, err = template.New("").Funcs(map[string]any{"formatMoney": formatMoney, "add": add, "sliceContains": sliceContains}).ParseFS(templatesFS, "templates/*.gohtml")
@@ -44,17 +49,18 @@ func Mount(mux *http.ServeMux, db *sql.DB) error {
 		return err
 	}
 	mux.Handle("/static/", http.FileServerFS(staticFiles))
-	mux.Handle("/{$}", authRoute(db, indexPage, []string{}))
-	mux.Handle("/costcentre/{costCentreIDPath}", authRoute(db, costCentrePage, []string{}))
+	mux.Handle("/{$}", authRoute(databases.DBGO, indexPage, []string{}))
+	mux.Handle("/costcentre/{costCentreIDPath}", authRoute(databases.DBGO, costCentrePage, []string{}))
 	mux.Handle("/login", http.RedirectHandler(tokenURL, http.StatusSeeOther))
-	mux.Handle("/token", route(db, tokenPage))
-	mux.Handle("/logout", route(db, logoutPage))
-	mux.Handle("/admin", authRoute(db, adminPage, []string{"admin", "view-all"}))
-	mux.Handle("/admin/upload", authRoute(db, uploadPage, []string{"admin"}))
-	mux.Handle("/api/CostCentres", cors(route(db, apiCostCentres)))
-	mux.Handle("/api/SecondaryCostCentres", cors(route(db, apiSecondaryCostCentre)))
-	mux.Handle("/api/BudgetLines", cors(route(db, apiBudgetLine)))
-	mux.Handle("/framebudget", authRoute(db, framePage, []string{}))
+	mux.Handle("/token", route(databases.DBGO, tokenPage))
+	mux.Handle("/logout", route(databases.DBGO, logoutPage))
+	mux.Handle("/admin", authRoute(databases.DBGO, adminPage, []string{"admin", "view-all"}))
+	mux.Handle("/admin/upload", authRoute(databases.DBGO, uploadPage, []string{"admin"}))
+	mux.Handle("/api/CostCentres", cors(route(databases.DBGO, apiCostCentres)))
+	mux.Handle("/api/SecondaryCostCentres", cors(route(databases.DBGO, apiSecondaryCostCentre)))
+	mux.Handle("/api/BudgetLines", cors(route(databases.DBGO, apiBudgetLine)))
+	mux.Handle("/framebudget", authRoute(databases.DBGO, framePage, []string{}))
+	mux.Handle("/resultreport", authRoute(databases.DBCF, reportPage, []string{}))
 
 	return nil
 }
@@ -211,7 +217,7 @@ func uploadPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []stri
 	if err != nil {
 		return fmt.Errorf("could not read file from form: %w", err)
 	}
-	err = database.SaveBudget(file)
+	err = database.SaveBudget(file, db)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -309,6 +315,18 @@ func framePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 		"sumotherframeline":     sumOtherFrameLine,
 		"permissions":           perms,
 		"loggedIn":              loggedIn,
+	}); err != nil {
+		return fmt.Errorf("Could not render template: %w", err)
+	}
+	return nil
+}
+
+func reportPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
+
+	if err := templates.ExecuteTemplate(w, "report.gohtml", map[string]any{
+		"motd":        motdGenerator(),
+		"permissions": perms,
+		"loggedIn":    loggedIn,
 	}); err != nil {
 		return fmt.Errorf("Could not render template: %w", err)
 	}

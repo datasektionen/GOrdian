@@ -47,12 +47,19 @@ func getYearsSince2017() []string {
 
 func reportPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
 
+	currentYear := strconv.Itoa(time.Now().Year())
+
+	selectedYear := r.FormValue("year")
+	if selectedYear == "" {
+		selectedYear = currentYear
+	}
+
 	CCList, err := getCCList(db)
 	if err != nil {
 		return fmt.Errorf("failed get scan CCList information from database: %v", err)
 	}
 
-	reportLines, err := getReportLines(db, r.FormValue("year"), r.FormValue("cc"))
+	reportLines, err := getReportLines(db, selectedYear, r.FormValue("cc"))
 	if err != nil {
 		return fmt.Errorf("failed to get scan report lines information from database: %v", err)
 	}
@@ -72,7 +79,7 @@ func reportPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []stri
 		"CCList":       CCList,
 		"years":        years,
 		"SelectedCC":   r.FormValue("cc"),
-		"SelectedYear": r.FormValue("year"),
+		"SelectedYear": selectedYear,
 	}); err != nil {
 		return fmt.Errorf("could not render template: %w", err)
 	}

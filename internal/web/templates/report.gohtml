@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+{{template "head.gohtml" .}}
+<body>
+<div id="methone-container-replace"></div>
+<div style="background-color: #78909C !important; color: white; padding: 20px;">
+    <h1 style="font-weight: bolder; font-size: 42px;">Resultatrapport</h1>
+</div>
+<div style="display:flex; justify-content: center">
+<h2>Vad har spenderats på min budgetpost?</h2>
+</div>
+<div style="display:flex; justify-content: center">
+<strong>OBS! Räknar endast med kvitton och fakturor i Cashflow</strong>
+</div>
+<br>
+</div>
+<div style="display:flex; justify-content: center">
+<p>Nedan kan du välja en nämnd eller ett projekt som du vill se</p>
+</div>
+<div style="display:flex; justify-content: center">
+<p>Du kan även välja ett specifikt år för att se vad som spenderades då</p>
+</div>
+<form style="display:flex; justify-content: center">
+    <select name="cc">
+        <option {{if or (eq $.SelectedCC "Alla") (eq $.SelectedCC "")}}selected{{end}}>Alla</option>
+        {{range $_, $CC := .CCList}}
+            <option {{if eq $CC $.SelectedCC}}selected{{end}}>{{$CC}}</option>
+        {{end}}
+    </select>
+    <br>
+    <select name="year">
+        <option {{if or (eq $.SelectedYear "Alla") (eq $.SelectedYear "")}}selected{{end}}>Alla</option>
+        {{range $_, $year := .years}}
+            <option {{if eq $year $.SelectedYear}}selected{{end}}>{{$year}}</option>
+        {{end}}
+    </select>
+    <button>
+        Visa
+    </button>
+</form>
+
+
+<div id="costCentre">
+    <div id="content">  
+        <table>
+            {{range $_, $ReportCostCentreLine := .report }}
+                <tr style="background-color: rgb(176,190,197) !important;">
+                    <th style="font-size: 15pt;">{{$ReportCostCentreLine.CostCentreName}}</th>
+                    <th>
+                        {{$ReportCostCentreLine.Total}}
+                    </th>
+                </tr>
+                {{range $_, $ReportSecondaryCostCentreLine := $ReportCostCentreLine.SecondaryCostCentresList}}
+                    <tr style="background-color: rgb(207,216,220) !important;">
+                        <th>  
+                            {{$ReportSecondaryCostCentreLine.SecondaryCostCentreName}}
+                        </th> 
+                        <th> 
+                            {{$ReportSecondaryCostCentreLine.Total}}          
+                        </th>
+                    </tr>
+                    {{range $_, $ReportBudgetLine := $ReportSecondaryCostCentreLine.BudgetLinesList}}
+                        <tr>
+                            <td style="white-space: wrap; color:black">  
+                                {{$ReportBudgetLine.BudgetLineName}}
+                            </td>
+                            <td style="white-space: wrap; color:black">  
+                                {{$ReportBudgetLine.Total}} kr
+                            </td>
+                        </tr>
+                    {{end}}
+                    <tr style="height: 1em;"></tr>
+                {{end}}
+                <tr style="height: 3em;"></tr>
+            {{end}}
+        </table>
+    </div>
+</div>
+<br><br><br><br><br><br><br>
+<footer class="footer-toolbar" style="align-items: center; text-align: center;">
+    <p>{{ .motd }} © 2024 GOrdian</p>
+    Budgetsystemet är skrivet av <a href="https://github.com/DouglasFischer">Douglas Fischer</a>
+</footer>
+</body>
+</html>

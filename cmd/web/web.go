@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/datasektionen/GOrdian/internal/config"
 	"github.com/datasektionen/GOrdian/internal/database"
 	"log"
 	"net/http"
@@ -9,11 +10,18 @@ import (
 )
 
 func main() {
-	db, err := database.Connect()
+	envVar := config.GetEnv()
+	dbGO, err := database.Connect(envVar.PsqlconnStringGOrdian)
 	if err != nil {
-		log.Printf("error accessing database: %v", err)
+		log.Printf("error accessing GOrdian database: %v", err)
 	}
-	if err := web.Mount(http.DefaultServeMux, db); err != nil {
+
+	dbCF, err := database.Connect(envVar.PsqlconnStringCashflow)
+	if err != nil {
+		log.Printf("error accessing Cashflow database: %v", err)
+	}
+
+	if err := web.Mount(http.DefaultServeMux, web.Databases{DBCF: dbCF, DBGO: dbGO}); err != nil {
 		panic(err)
 	}
 	panic(http.ListenAndServe("0.0.0.0:3000", nil))

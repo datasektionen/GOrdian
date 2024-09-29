@@ -1,22 +1,19 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/datasektionen/GOrdian/internal/excel"
 	"io"
 )
 
-func SaveBudget(fileReader io.Reader) error {
+func SaveBudget(fileReader io.Reader, db *sql.DB) error {
 	fmt.Println("You have very many money")
 	//testBudget := "test/Budget_2024.xlsx"
 	costCentres, secondaryCostCentres, budgetLines, err := excel.ReadExcel(fileReader)
+
 	if err != nil {
 		return fmt.Errorf("error parsing Excel file: %v", err)
-	}
-
-	db, err := Connect()
-	if err != nil {
-		return fmt.Errorf("error accessing database: %v", err)
 	}
 
 	err = WipeDatabase(db)

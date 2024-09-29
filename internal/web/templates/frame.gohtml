@@ -24,21 +24,21 @@
                 <th></th>
             </tr>
             {{range $_, $committeeframeline := .committeeframelines}}
-            <tr>
-                <td style="white-space: wrap; color:black;">{{$committeeframeline.FrameLineName}}</td>
-                <td style="color: {{if gt $committeeframeline.FrameLineIncome 0}} #4CAF50 {{else if lt $committeeframeline.FrameLineIncome 0}} #E57373 {{else}} black{{end}}; text-align: right;">
-                    {{formatMoney $committeeframeline.FrameLineIncome}} kr
-                </td>
-                <td style="color: {{if gt $committeeframeline.FrameLineExpense 0}} #4CAF50 {{else if lt $committeeframeline.FrameLineExpense 0}} #E57373 {{else}} black{{end}}; text-align: right;">
-                    {{formatMoney $committeeframeline.FrameLineExpense}} kr
-                </td>
-                <td style="color: {{if gt $committeeframeline.FrameLineInternal 0}} #4CAF50 {{else if lt $committeeframeline.FrameLineInternal 0}} #E57373 {{else}} black{{end}}; text-align: right;">
-                    {{formatMoney $committeeframeline.FrameLineInternal}} kr
-                </td>
-                <td style="color: {{if gt $committeeframeline.FrameLineResult 0}} #4CAF50 {{else if lt $committeeframeline.FrameLineResult 0}} #E57373 {{else}} black{{end}}; text-align: right;">
-                    {{formatMoney $committeeframeline.FrameLineResult}} kr
-                </td>
-            </tr>
+                <tr>
+                    <td style="white-space: wrap; color:black;">{{$committeeframeline.FrameLineName}}</td>
+                    <td style="color: {{if gt $committeeframeline.FrameLineIncome 0}} #4CAF50 {{else if lt $committeeframeline.FrameLineIncome 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                        {{formatMoney $committeeframeline.FrameLineIncome}} kr
+                    </td>
+                    <td style="color: {{if gt $committeeframeline.FrameLineExpense 0}} #4CAF50 {{else if lt $committeeframeline.FrameLineExpense 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                        {{formatMoney $committeeframeline.FrameLineExpense}} kr
+                    </td>
+                    <td style="color: {{if gt $committeeframeline.FrameLineInternal 0}} #4CAF50 {{else if lt $committeeframeline.FrameLineInternal 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                        {{formatMoney $committeeframeline.FrameLineInternal}} kr
+                    </td>
+                    <td style="color: {{if gt $committeeframeline.FrameLineResult 0}} #4CAF50 {{else if lt $committeeframeline.FrameLineResult 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                        {{formatMoney $committeeframeline.FrameLineResult}} kr
+                    </td>
+                </tr>
             {{end}}
             <tr style="background-color: rgb(207,216,220) !important;">
                 <th>Projekt</th>

@@ -38,6 +38,9 @@ func apiSecondaryCostCentre(w http.ResponseWriter, r *http.Request, db *sql.DB) 
 
 func apiBudgetLine(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	idSCC, err := strconv.Atoi(r.FormValue("id"))
+	if err != nil {
+		return fmt.Errorf("failed to convert SCC id fromstring to int: %v", err)
+	}
 	budgetLines, err := getBudgetLinesBySecondaryCostCentreID(db, idSCC)
 	if err != nil {
 		return fmt.Errorf("failed get scan budget lines information from database: %v", err)

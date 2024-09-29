@@ -5,13 +5,14 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
-	"github.com/datasektionen/GOrdian/internal/config"
-	"github.com/datasektionen/GOrdian/internal/database"
 	"html/template"
 	"log/slog"
 	"math/rand"
 	"net/http"
 	"strconv"
+
+	"github.com/datasektionen/GOrdian/internal/config"
+	"github.com/datasektionen/GOrdian/internal/database"
 )
 
 type Databases struct {
@@ -101,6 +102,9 @@ func authRoute(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, 
 			return fmt.Errorf("failed to decode user body from json: %v", err)
 		}
 		userPerms, err := http.Get(config.GetEnv().PlsURL + "/api/user/" + loginBody.User + "/" + config.GetEnv().PlsSystem)
+		if err != nil {
+			return fmt.Errorf("no response from pls: %v", err)
+		}
 
 		var perms []string
 		err = json.NewDecoder(userPerms.Body).Decode(&perms)

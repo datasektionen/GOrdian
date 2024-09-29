@@ -3,8 +3,9 @@ package web
 import (
 	"database/sql"
 	"fmt"
-	"github.com/datasektionen/GOrdian/internal/excel"
 	"net/http"
+
+	"github.com/datasektionen/GOrdian/internal/excel"
 )
 
 type FrameLine struct {
@@ -36,7 +37,7 @@ func framePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 		"permissions":           perms,
 		"loggedIn":              loggedIn,
 	}); err != nil {
-		return fmt.Errorf("Could not render template: %w", err)
+		return fmt.Errorf("could not render template: %w", err)
 	}
 	return nil
 }
@@ -96,7 +97,7 @@ func generateFrameLines(frameLines []excel.BudgetLine) ([]FrameLine, []FrameLine
 
 	var skippidi bool
 	for i, frameLine := range frameLines {
-		if skippidi == true {
+		if skippidi {
 			skippidi = false
 			continue
 		}

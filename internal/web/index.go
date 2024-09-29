@@ -3,11 +3,12 @@ package web
 import (
 	"database/sql"
 	"fmt"
-	"github.com/datasektionen/GOrdian/internal/excel"
 	"io"
 	"log/slog"
 	"net/http"
 	"strconv"
+
+	"github.com/datasektionen/GOrdian/internal/excel"
 )
 
 func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
@@ -60,7 +61,7 @@ func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 		"permissions": perms,
 		"loggedIn":    loggedIn,
 	}); err != nil {
-		return fmt.Errorf("Could not render template: %w", err)
+		return fmt.Errorf("could not render template: %w", err)
 	}
 	return nil
 }

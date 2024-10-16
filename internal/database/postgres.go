@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+
 	_ "github.com/lib/pq"
 )
 
@@ -23,6 +24,7 @@ func Connect(psqlconnString string) (*sql.DB, error) {
 	return db, nil
 }
 
+// unused for now
 func Close(db *sql.DB) error {
 	err := db.Close()
 	if err != nil {

@@ -94,6 +94,7 @@ func getCCList(db *sql.DB) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get CCList from database: %v", err)
 	}
+	defer result.Close()
 
 	var CCList []string
 
@@ -120,6 +121,7 @@ func getReportLines(db *sql.DB, year string, cc string) ([]ReportLine, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get reportlines from database: %v", err)
 	}
+	defer result.Close()
 
 	var reportLines []ReportLine
 

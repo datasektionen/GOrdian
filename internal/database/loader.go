@@ -3,8 +3,9 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"github.com/datasektionen/GOrdian/internal/excel"
 	"io"
+
+	"github.com/datasektionen/GOrdian/internal/excel"
 )
 
 func SaveBudget(fileReader io.Reader, db *sql.DB) error {
@@ -34,11 +35,6 @@ func SaveBudget(fileReader io.Reader, db *sql.DB) error {
 	err = InsertBudgetLines(db, budgetLines)
 	if err != nil {
 		return fmt.Errorf("error inserting budget lines in database: %v", err)
-	}
-
-	err = Close(db)
-	if err != nil {
-		return fmt.Errorf("error inserting budget in database: %v", err)
 	}
 
 	//fmt.Println(budgetLines)

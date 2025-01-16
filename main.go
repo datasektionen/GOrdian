@@ -1,10 +1,13 @@
 package main
 
 import (
-	"github.com/datasektionen/GOrdian/internal/config"
-	"github.com/datasektionen/GOrdian/internal/database"
+	"embed"
+	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/datasektionen/GOrdian/internal/config"
+	"github.com/datasektionen/GOrdian/internal/database"
 
 	"github.com/datasektionen/GOrdian/internal/web"
 )

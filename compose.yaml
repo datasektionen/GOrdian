@@ -54,4 +54,5 @@ services:
     image: ghcr.io/datasektionen/nyckeln-under-dorrmattan
     ports: [ 7002:7002 ]
     environment:
+      # le big admin moment, you can change this to the output of `curl https://dfunkt.datasektionen.se/api/role/kassor/current | jq '.mandates[0].User.kthid' -r`
       - KTH_ID=lukmal

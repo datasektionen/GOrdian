@@ -34,7 +34,7 @@ var templates *template.Template
 
 func Mount(mux *http.ServeMux, databases Databases) error {
 	var err error
-	tokenURL := config.GetEnv().LoginURL + "/login?callback=" + config.GetEnv().ServerURL + "/token?token="
+	tokenURL := config.GetEnv().LoginFrontendURL + "/login?callback=" + config.GetEnv().ServerURL + "/token?token="
 	templates, err = template.New("").Funcs(map[string]any{"formatMoney": formatMoney, "add": add, "sliceContains": sliceContains}).ParseFS(templatesFS, "templates/*.gohtml")
 	if err != nil {
 		return err
@@ -86,7 +86,7 @@ func authRoute(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, 
 			w.Write([]byte("Not logged in"))
 			return nil
 		}
-		loginUser, err := http.Get(config.GetEnv().LoginURL + "/verify/" + loginCookie.Value + "?api_key=" + config.GetEnv().LoginToken)
+		loginUser, err := http.Get(config.GetEnv().LoginAPIURL + "/verify/" + loginCookie.Value + "?api_key=" + config.GetEnv().LoginToken)
 		if err != nil {
 			return fmt.Errorf("no response from login: %v", err)
 		}

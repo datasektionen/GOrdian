@@ -5,7 +5,8 @@ import "os"
 type EnvVar struct {
 	PsqlconnStringGOrdian  string
 	PsqlconnStringCashflow string
-	LoginURL               string
+	LoginAPIURL            string
+	LoginFrontendURL       string
 	LoginToken             string
 	PlsURL                 string
 	PlsSystem              string
@@ -19,7 +20,8 @@ func GetEnv() EnvVar {
 		//prod
 		PsqlconnStringGOrdian:  os.Getenv("GO_CONN"),
 		PsqlconnStringCashflow: os.Getenv("CF_CONN"),
-		LoginURL:               os.Getenv("LOGIN_URL"),
+		LoginAPIURL:            os.Getenv("LOGIN_API_URL"),
+		LoginFrontendURL:       os.Getenv("LOGIN_FRONTEND_URL"),
 		LoginToken:             os.Getenv("LOGIN_TOKEN"),
 		PlsURL:                 os.Getenv("PLS_URL"),
 		PlsSystem:              os.Getenv("PLS_SYSTEM"),

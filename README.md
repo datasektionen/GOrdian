@@ -127,4 +127,17 @@ A Budget Line never has an Income and an Expense at the same time.
 ### Comment
 A *Comment* is used to further clarify the use of a Budget line
 
-## Very nice money budget
+# Very nice money budget
+
+# Running locally
+
+```sh
+docker compose up --build --watch
+```
+
+Then get yourself a god damn budget spreadsheet and go to http://localhost:3000/admin and upload it.
+To be able to see resultatrapport, you need to get a database dump and then write:
+
+```sh
+docker compose exec cashflow-db -iT pg_restore --no-owner -U cashflow -d cashflow -h localhost  < path/to/cashflow.sql
+```

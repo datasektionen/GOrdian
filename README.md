@@ -150,6 +150,8 @@ docker compose exec cashflow-db -iT pg_restore --no-owner -U cashflow -d cashflo
 
 ## Troubleshooting
 
+### Error getting credentials
+
 If you get the following error:
 
 ```
@@ -159,5 +161,11 @@ error getting credentials - err: exec: "docker-credential-desktop": executable f
 Try renaming "credsStore" to "credStore" in ~/.docker/config.json
 
 https://forums.docker.com/t/docker-credential-desktop-exe-executable-file-not-found-in-path-using-wsl2/100225/5
+
+### Other problems
+
+1. Ask Douglas
+2. Ask dsys
+3. Pray
 
 # Very nice money budget

@@ -148,4 +148,16 @@ docker compose exec cashflow-db -iT pg_restore --no-owner -U cashflow -d cashflo
 - ???
 - Profit!
 
+## Troubleshooting
+
+If you get the following error:
+
+```
+error getting credentials - err: exec: "docker-credential-desktop": executable file not found in $PATH, out: ``
+```
+
+Try renaming "credsStore" to "credStore" in ~/.docker/config.json
+
+https://forums.docker.com/t/docker-credential-desktop-exe-executable-file-not-found-in-path-using-wsl2/100225/5
+
 # Very nice money budget

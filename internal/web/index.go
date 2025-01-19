@@ -1,7 +1,6 @@
 package web
 
 import (
-	"database/sql"
 	"fmt"
 	"io"
 	"log/slog"
@@ -11,8 +10,8 @@ import (
 	"github.com/datasektionen/GOrdian/internal/excel"
 )
 
-func indexPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
-	costCentres, err := getCostCentres(db)
+func indexPage(w http.ResponseWriter, r *http.Request, databases Databases, perms []string, loggedIn bool) error {
+	costCentres, err := getCostCentres(databases.DBGO)
 	if err != nil {
 		return fmt.Errorf("failed get scan cost centre information from database: %v", err)
 	}

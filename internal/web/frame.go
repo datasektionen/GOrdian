@@ -16,8 +16,8 @@ type FrameLine struct {
 	FrameLineResult   int
 }
 
-func framePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
-	budgetLines, err := getFrameLines(db)
+func framePage(w http.ResponseWriter, r *http.Request, databases Databases, perms []string, loggedIn bool) error {
+	budgetLines, err := getFrameLines(databases.DBGO)
 	if err != nil {
 		return fmt.Errorf("failed get scan budget lines information from database: %v", err)
 	}

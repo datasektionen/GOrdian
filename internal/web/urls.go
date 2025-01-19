@@ -40,18 +40,26 @@ func Mount(mux *http.ServeMux, databases Databases) error {
 		return err
 	}
 	mux.Handle("/static/", http.FileServerFS(staticFiles))
-	mux.Handle("/{$}", authRoute(databases.DBGO, indexPage, []string{}))
-	mux.Handle("/costcentre/{costCentreIDPath}", authRoute(databases.DBGO, costCentrePage, []string{}))
+	mux.Handle("/{$}", authRoute(databases, indexPage, []string{}))
+	mux.Handle("/costcentre/{costCentreIDPath}", authRoute(databases, costCentrePage, []string{}))
 	mux.Handle("/login", http.RedirectHandler(tokenURL, http.StatusSeeOther))
-	mux.Handle("/token", route(databases.DBGO, tokenPage))
-	mux.Handle("/logout", route(databases.DBGO, logoutPage))
-	mux.Handle("/admin", authRoute(databases.DBGO, adminPage, []string{"admin", "view-all"}))
-	mux.Handle("/admin/upload", authRoute(databases.DBGO, uploadPage, []string{"admin"}))
-	mux.Handle("/api/CostCentres", cors(route(databases.DBGO, apiCostCentres)))
-	mux.Handle("/api/SecondaryCostCentres", cors(route(databases.DBGO, apiSecondaryCostCentre)))
-	mux.Handle("/api/BudgetLines", cors(route(databases.DBGO, apiBudgetLine)))
-	mux.Handle("/framebudget", authRoute(databases.DBGO, framePage, []string{}))
-	mux.Handle("/resultreport", authRoute(databases.DBCF, reportPage, []string{}))
+	mux.Handle("/token", route(databases, tokenPage))
+	mux.Handle("/logout", route(databases, logoutPage))
+	mux.Handle("/admin", authRoute(databases, adminPage, []string{"admin", "view-all"}))
+	mux.Handle("/admin/upload", authRoute(databases, uploadPage, []string{"admin"}))
+	mux.Handle("/api/CostCentres", cors(route(databases, apiCostCentres)))
+	mux.Handle("/api/SecondaryCostCentres", cors(route(databases, apiSecondaryCostCentre)))
+	mux.Handle("/api/BudgetLines", cors(route(databases, apiBudgetLine)))
+	mux.Handle("/framebudget", authRoute(databases, framePage, []string{}))
+
+	if databases.DBCF != nil {
+		mux.Handle("/resultreport", authRoute(databases, reportPage, []string{}))
+	} else {
+		mux.HandleFunc("/resultreport", func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Cannot load resultatrapport: cashflow database not initialized", http.StatusServiceUnavailable)
+		})
+	}
+
 
 	return nil
 }
@@ -63,9 +71,9 @@ func cors(h http.Handler) http.Handler {
 	})
 }
 
-func route(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, db *sql.DB) error) http.Handler {
+func route(databases Databases, handler func(w http.ResponseWriter, r *http.Request, databases Databases) error) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := handler(w, r, db)
+		err := handler(w, r, databases)
 		if err != nil {
 			slog.Error("Error from handler", "error", err)
 			w.WriteHeader(500)
@@ -74,12 +82,12 @@ func route(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, db *
 	})
 }
 
-func authRoute(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error, requiredPerms []string) http.Handler {
-	return route(db, func(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+func authRoute(databases Databases, handler func(w http.ResponseWriter, r *http.Request, databases Databases, perms []string, loggedIn bool) error, requiredPerms []string) http.Handler {
+	return route(databases, func(w http.ResponseWriter, r *http.Request, databases Databases) error {
 		loginCookie, err := r.Cookie(loginSessionCookieName)
 		if err != nil {
 			if len(requiredPerms) == 0 {
-				return handler(w, r, db, []string{}, false)
+				return handler(w, r, databases, []string{}, false)
 			}
 			slog.Error("failed to get login cookie", "error", err)
 			w.WriteHeader(http.StatusForbidden)
@@ -92,7 +100,7 @@ func authRoute(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, 
 		}
 
 		if loginUser.StatusCode != 200 {
-			return handler(w, r, db, []string{}, false)
+			return handler(w, r, databases, []string{}, false)
 		}
 		var loginBody struct {
 			User string `json:"user"`
@@ -118,7 +126,7 @@ func authRoute(db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, 
 			w.Write([]byte("Forbidden"))
 			return nil
 		}
-		return handler(w, r, db, perms, true)
+		return handler(w, r, databases, perms, true)
 	})
 
 }
@@ -154,7 +162,7 @@ func formatMoney(value int) string {
 	return result
 }
 
-func adminPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
+func adminPage(w http.ResponseWriter, r *http.Request, databases Databases, perms []string, loggedIn bool) error {
 	if err := templates.ExecuteTemplate(w, "admin.gohtml", map[string]any{
 		"motd":        motdGenerator(),
 		"permissions": perms,
@@ -165,12 +173,12 @@ func adminPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []strin
 	return nil
 }
 
-func uploadPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
+func uploadPage(w http.ResponseWriter, r *http.Request, databases Databases, perms []string, loggedIn bool) error {
 	file, _, err := r.FormFile("budgetFile")
 	if err != nil {
 		return fmt.Errorf("could not read file from form: %w", err)
 	}
-	err = database.SaveBudget(file, db)
+	err = database.SaveBudget(file, databases.DBGO)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -178,7 +186,7 @@ func uploadPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []stri
 	return nil
 }
 
-func tokenPage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+func tokenPage(w http.ResponseWriter, r *http.Request, databases Databases) error {
 	sessionCookieVal := r.FormValue("token")
 	sessionCookie := http.Cookie{Name: loginSessionCookieName, Value: sessionCookieVal}
 	http.SetCookie(w, &sessionCookie)
@@ -186,7 +194,7 @@ func tokenPage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	return nil
 }
 
-func logoutPage(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+func logoutPage(w http.ResponseWriter, r *http.Request, databases Databases) error {
 	sessionCookie := http.Cookie{Name: loginSessionCookieName, MaxAge: -1}
 	http.SetCookie(w, &sessionCookie)
 	http.Redirect(w, r, "/", http.StatusSeeOther)

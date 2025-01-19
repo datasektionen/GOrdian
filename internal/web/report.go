@@ -45,7 +45,7 @@ func getYearsSince2017() []string {
 	return years
 }
 
-func reportPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
+func reportPage(w http.ResponseWriter, r *http.Request, databases Databases, perms []string, loggedIn bool) error {
 
 	currentYear := strconv.Itoa(time.Now().Year())
 
@@ -54,12 +54,12 @@ func reportPage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []stri
 		selectedYear = currentYear
 	}
 
-	CCList, err := getCCList(db)
+	CCList, err := getCCList(databases.DBCF)
 	if err != nil {
 		return fmt.Errorf("failed get scan CCList information from database: %v", err)
 	}
 
-	reportLines, err := getReportLines(db, selectedYear, r.FormValue("cc"))
+	reportLines, err := getReportLines(databases.DBCF, selectedYear, r.FormValue("cc"))
 	if err != nil {
 		return fmt.Errorf("failed to get scan report lines information from database: %v", err)
 	}

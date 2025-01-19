@@ -1,21 +1,21 @@
 package web
 
 import (
-	"database/sql"
 	"fmt"
-	"github.com/datasektionen/GOrdian/internal/excel"
 	"net/http"
 	"strconv"
+
+	"github.com/datasektionen/GOrdian/internal/excel"
 )
 
-func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []string, loggedIn bool) error {
+func costCentrePage(w http.ResponseWriter, r *http.Request, databases Databases, perms []string, loggedIn bool) error {
 	costCentreIDString := r.PathValue("costCentreIDPath")
 	costCentreIDInt, err := strconv.Atoi(costCentreIDString)
 	if err != nil {
 		return fmt.Errorf("failed to convert cost centre id from string to int: %v", err)
 	}
 
-	budgetLines, err := getBudgetLinesByCostCentreID(db, costCentreIDInt)
+	budgetLines, err := getBudgetLinesByCostCentreID(databases.DBGO, costCentreIDInt)
 	if err != nil {
 		return fmt.Errorf("failed get scan budget line information from database: %v", err)
 	}
@@ -35,7 +35,7 @@ func costCentrePage(w http.ResponseWriter, r *http.Request, db *sql.DB, perms []
 	}
 	secondaryCostCentresWithBudgetLinesList = secondaryCostCentresWithBudgetLinesList[1:]
 
-	costCentre, err := getCostCentreByID(db, costCentreIDInt)
+	costCentre, err := getCostCentreByID(databases.DBGO, costCentreIDInt)
 	if err != nil {
 		return fmt.Errorf("failed get scan cost centre information from database: %v", err)
 	}

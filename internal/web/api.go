@@ -1,15 +1,14 @@
 package web
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 )
 
-func apiCostCentres(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
-	costCentres, err := getCostCentres(db)
+func apiCostCentres(w http.ResponseWriter, r *http.Request, databases Databases) error {
+	costCentres, err := getCostCentres(databases.DBGO)
 	if err != nil {
 		return fmt.Errorf("failed get scan cost centres information from database: %v", err)
 	}
@@ -20,12 +19,12 @@ func apiCostCentres(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	return nil
 }
 
-func apiSecondaryCostCentre(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+func apiSecondaryCostCentre(w http.ResponseWriter, r *http.Request, databases Databases) error {
 	idCC, err := strconv.Atoi(r.FormValue("id"))
 	if err != nil {
 		return fmt.Errorf("failed to convert secondary cost centre id to int: %v", err)
 	}
-	secondaryCostCentres, err := getSecondaryCostCentresByCostCentreID(db, idCC)
+	secondaryCostCentres, err := getSecondaryCostCentresByCostCentreID(databases.DBGO, idCC)
 	if err != nil {
 		return fmt.Errorf("failed get scan sendondary cost centres information from database: %v", err)
 	}
@@ -36,12 +35,12 @@ func apiSecondaryCostCentre(w http.ResponseWriter, r *http.Request, db *sql.DB) 
 	return nil
 }
 
-func apiBudgetLine(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+func apiBudgetLine(w http.ResponseWriter, r *http.Request, databases Databases) error {
 	idSCC, err := strconv.Atoi(r.FormValue("id"))
 	if err != nil {
 		return fmt.Errorf("failed to convert SCC id fromstring to int: %v", err)
 	}
-	budgetLines, err := getBudgetLinesBySecondaryCostCentreID(db, idSCC)
+	budgetLines, err := getBudgetLinesBySecondaryCostCentreID(databases.DBGO, idSCC)
 	if err != nil {
 		return fmt.Errorf("failed get scan budget lines information from database: %v", err)
 	}

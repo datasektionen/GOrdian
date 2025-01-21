@@ -58,6 +58,7 @@ func getYearsSince2017() []string {
 func reportPage(w http.ResponseWriter, r *http.Request, databases Databases, perms []string, loggedIn bool) error {
 
 	currentYear := strconv.Itoa(time.Now().Year())
+	// currentYear := "2024"
 
 	selectedYear := r.FormValue("year")
 	if selectedYear == "" {
@@ -103,6 +104,7 @@ func reportPage(w http.ResponseWriter, r *http.Request, databases Databases, per
 		"years":        years,
 		"SelectedCC":   r.FormValue("cc"),
 		"SelectedYear": selectedYear,
+		"CurrentYear": currentYear,
 	}); err != nil {
 		return fmt.Errorf("could not render template: %w", err)
 	}
@@ -202,7 +204,7 @@ func StructureReportLines(cashflowLines []CashflowLine, simpleBudgetLines []Simp
 	var costCentres []ReportCostCentreLine
 
 	currentYear := strconv.Itoa(time.Now().Year())
-	//currentYear := "2024"
+	// currentYear := "2024"
 
 	// Loop through each CashflowLine and structure it
 	for _, line := range cashflowLines {
@@ -304,6 +306,11 @@ func StructureReportLines(cashflowLines []CashflowLine, simpleBudgetLines []Simp
 		for j := range costCentres[i].SecondaryCostCentresList {
 			if costCentres[i].SecondaryCostCentresList[j].Budget == "0" {
 				costCentres[i].SecondaryCostCentresList[j].Budget = ""
+			}
+			for k := range costCentres[i].SecondaryCostCentresList[j].BudgetLinesList {
+				if costCentres[i].SecondaryCostCentresList[j].BudgetLinesList[k].Budget == "0" {
+					costCentres[i].SecondaryCostCentresList[j].BudgetLinesList[k].Budget= ""
+				}
 			}
 		}
 	}

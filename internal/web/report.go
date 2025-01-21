@@ -65,7 +65,6 @@ func reportPage(w http.ResponseWriter, r *http.Request, databases Databases, per
 		selectedYear = currentYear
 	}
 
-	// Fetch simple budget lines
 	simpleBudgetLines, err := getSimpleBudgetLines(databases.DBGO)
 	if err != nil {
 		return fmt.Errorf("failed to get simple budget line information from database: %v", err)
@@ -76,17 +75,10 @@ func reportPage(w http.ResponseWriter, r *http.Request, databases Databases, per
 		return fmt.Errorf("failed get scan CCList information from database: %v", err)
 	}
 
-	// Fetch cashflow lines
 	cashflowLines, err := getCashflowLines(databases.DBCF, selectedYear, r.FormValue("cc"))
 	if err != nil {
 		return fmt.Errorf("failed to get scan cashflow lines information from database: %v", err)
 	}
-
-	// Populate report lines with expenses only for the current year
-	// reportLines, err = addBudgetToReportLinesForCurrentYear(reportLines, simpleBudgetLines, selectedYear, currentYear)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to populate report lines for the current year: %v", err)
-	// }
 
 	structuredReport, err := StructureReportLines(cashflowLines, simpleBudgetLines, selectedYear)
 	if err != nil {
@@ -167,7 +159,6 @@ func getCashflowLines(db *sql.DB, year string, cc string) ([]CashflowLine, error
 	return cashflowLines, nil
 }
 
-// Helper function to find or add a CostCentre
 func findOrAddCostCentre(costCentres *[]ReportCostCentreLine, name string) *ReportCostCentreLine {
 	for i := range *costCentres {
 		if (*costCentres)[i].CostCentreName == name {
@@ -183,7 +174,6 @@ func findOrAddCostCentre(costCentres *[]ReportCostCentreLine, name string) *Repo
 	return &(*costCentres)[len(*costCentres)-1]
 }
 
-// Helper function to find or add a SecondaryCostCentre
 func findOrAddSecondaryCostCentre(secCostCentres *[]ReportSecondaryCostCentreLine, name string) *ReportSecondaryCostCentreLine {
 	for i := range *secCostCentres {
 		if (*secCostCentres)[i].SecondaryCostCentreName == name {
@@ -199,28 +189,25 @@ func findOrAddSecondaryCostCentre(secCostCentres *[]ReportSecondaryCostCentreLin
 	return &(*secCostCentres)[len(*secCostCentres)-1]
 }
 
-// Function to organize CashflowLines into structured data
+// Organize CashflowLines into structured data
 func StructureReportLines(cashflowLines []CashflowLine, simpleBudgetLines []SimpleBudgetLine, selectedYear string) ([]ReportCostCentreLine, error) {
 	var costCentres []ReportCostCentreLine
 
 	currentYear := strconv.Itoa(time.Now().Year())
 	// currentYear := "2024"
 
-	// Loop through each CashflowLine and structure it
+	// Process CashflowLines
 	for _, line := range cashflowLines {
-		// Find or add the CostCentre
+		
 		costCentre := findOrAddCostCentre(&costCentres, line.CashflowLineCostCentre)
 
-		// Find or add the SecondaryCostCentre within the CostCentre
 		secCostCentre := findOrAddSecondaryCostCentre(&costCentre.SecondaryCostCentresList, line.CashflowLineSecondaryCostCentre)
 
-		// Add the BudgetLine to the SecondaryCostCentre
 		secCostCentre.BudgetLinesList = append(secCostCentre.BudgetLinesList, ReportBudgetLine{
 			BudgetLineName: line.CashflowLineBudgetLine,
 			Total:          line.CashflowLineTotal,
 		})
 		
-		// Update totals for SecondaryCostCentre and CostCentre
 		var err1, err2 error
 
 		secCostCentre.Total, err1 = addTotals(secCostCentre.Total, line.CashflowLineTotal)
@@ -233,7 +220,7 @@ func StructureReportLines(cashflowLines []CashflowLine, simpleBudgetLines []Simp
 
 	// Process SimpleBudgetLines
 	for _, budgetLine := range simpleBudgetLines {
-		// Check if the SimpleBudgetLine exists in the CashflowLines
+
 		existsInCashflow := false
 		for _, cashflowLine := range cashflowLines {
 			if cashflowLine.CashflowLineCostCentre == budgetLine.BudgetLineCostCentreName &&
@@ -248,23 +235,18 @@ func StructureReportLines(cashflowLines []CashflowLine, simpleBudgetLines []Simp
 			continue
 		}
 
-		// Find or add the CostCentre
 		costCentre := findOrAddCostCentre(&costCentres, budgetLine.BudgetLineCostCentreName)
 
-		// Find or add the SecondaryCostCentre within the CostCentre
 		secCostCentre := findOrAddSecondaryCostCentre(&costCentre.SecondaryCostCentresList, budgetLine.BudgetLineSecondaryCostCentreName)
 
-		// Check if the selectedYear matches the current year
 		budgetValue := "0"
 		if selectedYear == currentYear {
 			budgetValue = makePositive(budgetLine.BudgetLineExpense)
 		}
 
-		// Add or update the BudgetLine in the SecondaryCostCentre
 		found := false
 		for i, bl := range secCostCentre.BudgetLinesList {
 			if bl.BudgetLineName == budgetLine.BudgetLineName {
-				// Update the budget value
 				updatedBudget, err := addTotals(secCostCentre.BudgetLinesList[i].Budget, budgetValue)
 				if err != nil {
 					return nil, fmt.Errorf("failed to update budget value: %v", err)
@@ -275,15 +257,13 @@ func StructureReportLines(cashflowLines []CashflowLine, simpleBudgetLines []Simp
 			}
 		}
 		if !found {
-			// Add a new budget line if it doesn't exist
 			secCostCentre.BudgetLinesList = append(secCostCentre.BudgetLinesList, ReportBudgetLine{
 				BudgetLineName: budgetLine.BudgetLineName,
-				Total:          "0", // Placeholder for total
+				Total:          "0",
 				Budget:         budgetValue,
 			})
 		}
 
-		// Update the budget totals for the SecondaryCostCentre and CostCentre
 		if selectedYear == currentYear {
 			var err error
 			secCostCentre.Budget, err = addTotals(secCostCentre.Budget, budgetValue)
@@ -298,7 +278,6 @@ func StructureReportLines(cashflowLines []CashflowLine, simpleBudgetLines []Simp
 		}
 	}
 
-	// Set budget values to "-" if they are zero
 	for i := range costCentres {
 		if costCentres[i].Budget == "0" {
 			costCentres[i].Budget = ""
@@ -340,7 +319,6 @@ func getSimpleBudgetLines(db *sql.DB) ([]SimpleBudgetLine, error) {
 
 	var simpleBudgetLines []SimpleBudgetLine
 
-	// Iterate over the result rows
 	for rows.Next() {
 		var simpleBudgetLine SimpleBudgetLine
 
@@ -357,7 +335,6 @@ func getSimpleBudgetLines(db *sql.DB) ([]SimpleBudgetLine, error) {
 		simpleBudgetLines = append(simpleBudgetLines, simpleBudgetLine)
 	}
 
-	// Check for errors during iteration
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("error iterating through simple budget lines: %v", err)
 	}
@@ -365,9 +342,7 @@ func getSimpleBudgetLines(db *sql.DB) ([]SimpleBudgetLine, error) {
 	return simpleBudgetLines, nil
 }
 
-// Helper function to add totals (no handling of "kr" suffix)
 func addTotals(total1, total2 string) (string, error) {
-	// Normalize input values
 	total1 = strings.TrimSpace(total1)
 	total2 = strings.TrimSpace(total2)
 
@@ -378,7 +353,6 @@ func addTotals(total1, total2 string) (string, error) {
 		total2 = "0"
 	}
 
-	// Convert to floats
 	t1, err1 := strconv.ParseFloat(total1, 64)
 	t2, err2 := strconv.ParseFloat(total2, 64)
 
@@ -386,12 +360,10 @@ func addTotals(total1, total2 string) (string, error) {
 		return "0", fmt.Errorf("failed to convert totals to float: %v, %v", err1, err2)
 	}
 
-	// Add and format the result
 	result := t1 + t2
 	return formatNumber(result), nil
 }
 
-// Helper function to make a value positive (no "kr" suffix)
 func makePositive(value string) string {
 	value = strings.TrimSpace(value)
 
@@ -407,9 +379,10 @@ func makePositive(value string) string {
 	return formatNumber(parsed)
 }
 
+// removes unnecessary zeros
 func formatNumber(value float64) string {
 	if value == float64(int(value)) {
-		return fmt.Sprintf("%d", int(value)) // No decimals if the value is an integer
+		return fmt.Sprintf("%d", int(value))
 	}
-	return strings.TrimRight(strings.TrimRight(fmt.Sprintf("%.2f", value), "0"), ".") // Remove unnecessary zeros
+	return strings.TrimRight(strings.TrimRight(fmt.Sprintf("%.2f", value), "0"), ".")
 }

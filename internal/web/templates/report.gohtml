@@ -20,6 +20,9 @@
 <div style="display:flex; justify-content: center">
 <p>Du kan även välja ett specifikt år för att se vad som spenderades då</p>
 </div>
+<div style="display:flex; justify-content: center">
+<p>Väljer du det nuvarande året kan du även se vad som är budgetterat för posterna</p>
+</div>
 <form style="display:flex; justify-content: center">
     <select name="cc">
         <option {{if or (eq $.SelectedCC "Alla") (eq $.SelectedCC "")}}selected{{end}}>Alla</option>
@@ -46,7 +49,9 @@
             <tr style="background-color: rgb(176,190,197) !important;">
                 <th style="font-size: 15pt;">Nämnd/Projekt</th>
                 <th style="font-size: 15pt;">Spenderat</th>
-                <th style="font-size: 15pt;">Budgeterat</th>
+                {{if eq $.CurrentYear $.SelectedYear}}
+                    <th style="font-size: 15pt;">Budgeterat</th>
+                {{end}}
             </tr>
             <tr style="height: 1em;"></tr>
             {{range $_, $ReportCostCentreLine := .report }}
@@ -55,13 +60,15 @@
                     <th>
                         {{$ReportCostCentreLine.Total}} kr
                     </th>
-                    <th>
-                         {{if $ReportCostCentreLine.Budget}}
-                             {{$ReportCostCentreLine.Budget}} kr
-                         {{else}}
-                             -
-                         {{end}}
-                    </th>
+                    {{if eq $.CurrentYear $.SelectedYear}}
+                        <th>
+                             {{if $ReportCostCentreLine.Budget}}
+                                 {{$ReportCostCentreLine.Budget}} kr
+                             {{else}}
+                                 -
+                             {{end}}
+                        </th>
+                    {{end}}
                 </tr>
                 {{range $_, $ReportSecondaryCostCentreLine := $ReportCostCentreLine.SecondaryCostCentresList}}
                     <tr style="background-color: rgb(207,216,220) !important;">
@@ -71,13 +78,15 @@
                         <th> 
                             {{$ReportSecondaryCostCentreLine.Total}} kr          
                         </th>
-                        <th>
-                            {{if $ReportSecondaryCostCentreLine.Budget}}
-                                {{$ReportSecondaryCostCentreLine.Budget}} kr
-                            {{else}}
-                                -
-                            {{end}}
-                        </th>
+                        {{if eq $.CurrentYear $.SelectedYear}}
+                            <th>
+                                {{if $ReportSecondaryCostCentreLine.Budget}}
+                                    {{$ReportSecondaryCostCentreLine.Budget}} kr
+                                {{else}}
+                                    -
+                                {{end}}
+                            </th>
+                        {{end}}
                     </tr>
                     {{range $_, $ReportBudgetLine := $ReportSecondaryCostCentreLine.BudgetLinesList}}
                         <tr>
@@ -87,13 +96,15 @@
                             <td style="white-space: wrap; color:black">  
                                 {{$ReportBudgetLine.Total}} kr
                             </td>
-                            <td style="white-space: wrap; color:black">
-                                {{if $ReportBudgetLine.Budget}}
-                                    {{$ReportBudgetLine.Budget}} kr
-                                {{else}}
-                                    -
-                                {{end}}
-                            </td>
+                            {{if eq $.CurrentYear $.SelectedYear}}
+                                <td style="white-space: wrap; color:black">
+                                    {{if $ReportBudgetLine.Budget}}
+                                        {{$ReportBudgetLine.Budget}} kr
+                                    {{else}}
+                                        -
+                                    {{end}}
+                                </td>
+                            {{end}}
                         </tr>
                     {{end}}
                     <tr style="height: 1em;"></tr>

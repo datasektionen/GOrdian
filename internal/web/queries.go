@@ -1,6 +1,6 @@
 package web
 
-var CombinedReportLinesGetStatementStatic = `
+var CombinedCashflowLinesGetStatementStatic = `
     SELECT 
         cost_centre, 
         secondary_cost_centre, 

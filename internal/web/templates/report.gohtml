@@ -43,11 +43,24 @@
 <div id="costCentre">
     <div id="content">  
         <table>
+            <tr style="background-color: rgb(176,190,197) !important;">
+                <th style="font-size: 15pt;">Nämnd/Projekt</th>
+                <th style="font-size: 15pt;">Spenderat</th>
+                <th style="font-size: 15pt;">Budgeterat</th>
+            </tr>
+            <tr style="height: 1em;"></tr>
             {{range $_, $ReportCostCentreLine := .report }}
                 <tr style="background-color: rgb(176,190,197) !important;">
                     <th style="font-size: 15pt;">{{$ReportCostCentreLine.CostCentreName}}</th>
                     <th>
-                        {{$ReportCostCentreLine.Total}}
+                        {{$ReportCostCentreLine.Total}} kr
+                    </th>
+                    <th>
+                         {{if $ReportCostCentreLine.Budget}}
+                             {{$ReportCostCentreLine.Budget}} kr
+                         {{else}}
+                             -
+                         {{end}}
                     </th>
                 </tr>
                 {{range $_, $ReportSecondaryCostCentreLine := $ReportCostCentreLine.SecondaryCostCentresList}}
@@ -56,7 +69,14 @@
                             {{$ReportSecondaryCostCentreLine.SecondaryCostCentreName}}
                         </th> 
                         <th> 
-                            {{$ReportSecondaryCostCentreLine.Total}}          
+                            {{$ReportSecondaryCostCentreLine.Total}} kr          
+                        </th>
+                        <th>
+                            {{if $ReportSecondaryCostCentreLine.Budget}}
+                                {{$ReportSecondaryCostCentreLine.Budget}} kr
+                            {{else}}
+                                -
+                            {{end}}
                         </th>
                     </tr>
                     {{range $_, $ReportBudgetLine := $ReportSecondaryCostCentreLine.BudgetLinesList}}
@@ -66,6 +86,13 @@
                             </td>
                             <td style="white-space: wrap; color:black">  
                                 {{$ReportBudgetLine.Total}} kr
+                            </td>
+                            <td style="white-space: wrap; color:black">
+                                {{if $ReportBudgetLine.Budget}}
+                                    {{$ReportBudgetLine.Budget}} kr
+                                {{else}}
+                                    -
+                                {{end}}
                             </td>
                         </tr>
                     {{end}}

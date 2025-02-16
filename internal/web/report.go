@@ -12,8 +12,8 @@ import (
 type SimpleBudgetLine struct {
 	BudgetLineCostCentreName          string
 	BudgetLineSecondaryCostCentreName string
-	BudgetLineName         			  string
-	BudgetLineExpense             	  string
+	BudgetLineName                    string
+	BudgetLineExpense                 string
 }
 
 type CashflowLine struct {
@@ -24,23 +24,23 @@ type CashflowLine struct {
 }
 
 type ReportBudgetLine struct {
-	BudgetLineName 	string
-	Total          	string
-	Budget			string
+	BudgetLineName string
+	Total          string
+	Budget         string
 }
 
 type ReportSecondaryCostCentreLine struct {
 	SecondaryCostCentreName string
 	BudgetLinesList         []ReportBudgetLine
 	Total                   string
-	Budget					string
+	Budget                  string
 }
 
 type ReportCostCentreLine struct {
 	CostCentreName           string
 	SecondaryCostCentresList []ReportSecondaryCostCentreLine
 	Total                    string
-	Budget					 string
+	Budget                   string
 }
 
 func getYearsSince2017() []string {
@@ -57,8 +57,8 @@ func getYearsSince2017() []string {
 
 func reportPage(w http.ResponseWriter, r *http.Request, databases Databases, perms []string, loggedIn bool) error {
 
-	currentYear := strconv.Itoa(time.Now().Year())
-	// currentYear := "2024"
+	//currentYear := strconv.Itoa(time.Now().Year())
+	currentYear := "2024"
 
 	selectedYear := r.FormValue("year")
 	if selectedYear == "" {
@@ -87,16 +87,16 @@ func reportPage(w http.ResponseWriter, r *http.Request, databases Databases, per
 	years := getYearsSince2017()
 
 	if err := templates.ExecuteTemplate(w, "report.gohtml", map[string]any{
-		"motd":         motdGenerator(),
-		"cashflowLines":  cashflowLines,
-		"permissions":  perms,
-		"loggedIn":     loggedIn,
-		"report":       structuredReport,
-		"CCList":       CCList,
-		"years":        years,
-		"SelectedCC":   r.FormValue("cc"),
-		"SelectedYear": selectedYear,
-		"CurrentYear": currentYear,
+		"motd":          motdGenerator(),
+		"cashflowLines": cashflowLines,
+		"permissions":   perms,
+		"loggedIn":      loggedIn,
+		"report":        structuredReport,
+		"CCList":        CCList,
+		"years":         years,
+		"SelectedCC":    r.FormValue("cc"),
+		"SelectedYear":  selectedYear,
+		"CurrentYear":   currentYear,
 	}); err != nil {
 		return fmt.Errorf("could not render template: %w", err)
 	}
@@ -193,12 +193,12 @@ func findOrAddSecondaryCostCentre(secCostCentres *[]ReportSecondaryCostCentreLin
 func StructureReportLines(cashflowLines []CashflowLine, simpleBudgetLines []SimpleBudgetLine, selectedYear string) ([]ReportCostCentreLine, error) {
 	var costCentres []ReportCostCentreLine
 
-	currentYear := strconv.Itoa(time.Now().Year())
-	// currentYear := "2024"
+	//currentYear := strconv.Itoa(time.Now().Year())
+	currentYear := "2024"
 
 	// Process CashflowLines
 	for _, line := range cashflowLines {
-		
+
 		costCentre := findOrAddCostCentre(&costCentres, line.CashflowLineCostCentre)
 
 		secCostCentre := findOrAddSecondaryCostCentre(&costCentre.SecondaryCostCentresList, line.CashflowLineSecondaryCostCentre)
@@ -207,7 +207,7 @@ func StructureReportLines(cashflowLines []CashflowLine, simpleBudgetLines []Simp
 			BudgetLineName: line.CashflowLineBudgetLine,
 			Total:          line.CashflowLineTotal,
 		})
-		
+
 		var err1, err2 error
 
 		secCostCentre.Total, err1 = addTotals(secCostCentre.Total, line.CashflowLineTotal)
@@ -288,7 +288,7 @@ func StructureReportLines(cashflowLines []CashflowLine, simpleBudgetLines []Simp
 			}
 			for k := range costCentres[i].SecondaryCostCentresList[j].BudgetLinesList {
 				if costCentres[i].SecondaryCostCentresList[j].BudgetLinesList[k].Budget == "0" {
-					costCentres[i].SecondaryCostCentresList[j].BudgetLinesList[k].Budget= ""
+					costCentres[i].SecondaryCostCentresList[j].BudgetLinesList[k].Budget = ""
 				}
 			}
 		}

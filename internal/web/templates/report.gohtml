@@ -3,27 +3,27 @@
 {{template "head.gohtml" .}}
 <body>
 <div id="methone-container-replace"></div>
-<div style="background-color: #78909C !important; color: white; padding: 20px;">
+<div class="page-title">
     <h1 style="font-weight: bolder; font-size: 42px;">Resultatrapport</h1>
 </div>
-<div style="display:flex; justify-content: center">
+<div class="centering">
 <h2>Vad har spenderats på min budgetpost?</h2>
 </div>
-<div style="display:flex; justify-content: center">
+<div class="centering">
 <strong>OBS! Räknar endast med kvitton och fakturor i Cashflow</strong>
 </div>
 <br>
 </div>
-<div style="display:flex; justify-content: center">
+<div class="centering">
 <p>Nedan kan du välja en nämnd eller ett projekt som du vill se</p>
 </div>
-<div style="display:flex; justify-content: center">
+<div class="centering">
 <p>Du kan även välja ett specifikt år för att se vad som spenderades då</p>
 </div>
-<div style="display:flex; justify-content: center">
+<div class="centering">
 <p>Väljer du det nuvarande året kan du även se vad som är budgetterat för posterna</p>
 </div>
-<form style="display:flex; justify-content: center">
+<form class="centering">
     <select name="cc">
         <option {{if or (eq $.SelectedCC "Alla") (eq $.SelectedCC "")}}selected{{end}}>Alla</option>
         {{range $_, $CC := .CCList}}

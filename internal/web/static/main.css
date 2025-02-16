@@ -110,3 +110,15 @@ h1 {
     margin: 5px;
     cursor: pointer; 
 }
+
+.centering { /* Oklart vad du vill döpa den till */
+    display:flex; 
+    justify-content: center;
+}
+
+div.page-title { /* För att fixa "header" */ 
+    background-color: #78909C !important; 
+    color: white; 
+    padding-top: 35px;
+    padding-bottom: 15px;
+}

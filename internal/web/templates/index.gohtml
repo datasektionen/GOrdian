@@ -2,41 +2,40 @@
 <html lang="en">
 {{template "head.gohtml" .}}
 <body>
-<div style="margin-bottom: 50px">
+<div>
     <div id="methone-container-replace"></div>
     <div class="page-title">
-        <h1 style="font-weight: bolder; font-size: 42px;">Datasektionens budgetsystem</h1>
+        <h1>Datasektionens budgetsystem</h1>
     </div>
     <div id="costCentreNames">
-        <div class="btn-group">
+        <div class="costCentre-group">
             <h2> Nämnder </h2>
-            <ul style="display: grid;
-            grid-template-columns: 1fr 1fr 1fr;">
-                {{range $_,$committee:= .committees}} <button onclick="location.href='/costcentre/{{$committee.CostCentreID}}'"> {{$committee.CostCentreName}} </button>{{end}}
-            </ul>
+            <div class="btn-group">
+                {{range $_,$committee:= .committees}}
+                 <button onclick="location.href='/costcentre/{{$committee.CostCentreID}}'"> {{$committee.CostCentreName}} </button>
+                 {{end}}
+            </div>
         </div>
-        <div class="btn-group">
+         <div class="costCentre-group">
             <h2> Projekt </h2>
-            <ul style="display: grid;
-            grid-template-columns: 1fr 1fr;">
+                <div class="btn-group">
                 {{range $_,$project:= .projects}}
                     <button onclick="location.href='/costcentre/{{$project.CostCentreID}}'"> {{$project.CostCentreName}} </button>
                 {{end}}
-            </ul>
+            </div>
         </div>
-        <div class="btn-group">
+            <div class="costCentre-group">
             <h2> Övrigt </h2>
-            <ul style="display: grid;
-            grid-template-columns: 1fr;">
+           <div class="btn-group">
                 {{range $_,$other:= .others}} 
                     <button onclick="location.href='/costcentre/{{$other.CostCentreID}}'"> {{$other.CostCentreName}} </button>
                 {{end}}
-            </ul>
+             </div>
         </div>
     </div>
     <br/>
     </div>
-    <footer class="footer-toolbar" style="align-items: center; text-align: center;">
+    <footer class="footer-toolbar">
         <p>{{ .motd }} © 2024 GOrdian</p>
         Budgetsystemet är skrivet av <a href="https://github.com/DouglasFischer">Douglas Fischer</a>
     </footer>

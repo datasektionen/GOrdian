@@ -4,63 +4,56 @@
 <body>
     <div id="methone-container-replace"></div>
     <div class="page-title">
-        <h1 style="font-weight: bolder; font-size: 42px;">Budget: {{.costCentre.CostCentreName}}</h1>
+        <h1>Budget: {{.costCentre.CostCentreName}}</h1>
     </div>
     <div id="costCentre">
         <div id="content">
             <table>
                 <tr style="background-color: rgb(176,190,197) !important;">
-                    <th style="font-size: 15pt;">{{.costCentre.CostCentreName}}</th>
+                    <th>{{.costCentre.CostCentreName}}</th>
                     <th class="hide-on-mobile hide-on-half-desktop"></th>
-                    <th class="hide-on-mobile"
-                        style="color: {{if gt .costCentreTotalIncome 0}} #4CAF50 {{else if lt .costCentreTotalIncome 0}} #E57373 {{else}} black{{end}}; text-align: right; font-size: 15pt;">
+                    <th class="hide-on-mobile cost-title {{if gt .costCentreTotalIncome 0}} positive {{else if lt .costCentreTotalIncome 0}} negative {{else}} net{{end}}">
                         {{formatMoney .costCentreTotalIncome}} kr
                     </th>
-                    <th class="hide-on-mobile"
-                        style="color: {{if gt .costCentreTotalExpense 0}} #4CAF50 {{else if lt .costCentreTotalExpense 0}} #E57373 {{else}} black{{end}}; text-align: right; font-size: 15pt;">
+                    <th class="hide-on-mobile cost-title {{if gt .costCentreTotalExpense 0}} positive {{else if lt .costCentreTotalExpense 0}} negative {{else}} net{{end}}">
                         {{formatMoney .costCentreTotalExpense}} kr
                     </th>
                     <th
-                        style="color: {{if gt .costCentreTotalResult 0}} #4CAF50 {{else if lt .costCentreTotalResult 0}} #E57373 {{else}} black{{end}}; text-align: right; font-size: 15pt;">
+                        class="{{if gt .costCentreTotalResult 0}} positive {{else if lt .costCentreTotalResult 0}} negative {{else}} net{{end}}">
                         {{formatMoney .costCentreTotalResult}} kr
                     </th>
                 </tr>
                 <tr style="height: 1em;"></tr>
                 <tr style="background-color: rgb(176,190,197) !important; ">
-                    <th>Budgetpost</th>
-                    <th class="hide-on-mobile hide-on-half-desktop">Bokföringskonto</th>
-                    <th class="hide-on-mobile" style="text-align: right;">Intäkter</th>
-                    <th class="hide-on-mobile" style="text-align: right;">Utgifter</th>
-                    <th style="text-align: right;">Resultat</th>
+                    <th class="cost-left">Budgetpost</th>
+                    <th class="hide-on-mobile hide-on-half-desktop cost-left">Bokföringskonto</th>
+                    <th class="hide-on-mobile">Intäkter</th>
+                    <th class="hide-on-mobile">Utgifter</th>
+                    <th >Resultat</th>
                 </tr>
 
                 </tr>
                 {{range $_, $secondaryCostCentresWithBudgetLines := .secondaryCostCentresWithBudgetLinesList}}
                 <tr style="background-color: rgb(207,216,220) !important;">
-                    <th>{{$secondaryCostCentresWithBudgetLines.SecondaryCostCentreName}}</th>
-                    <th class="hide-on-mobile hide-on-half-desktop"></th>
-                    <th class="hide-on-mobile"
-                        style="color: {{if gt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalIncome 0}} #4CAF50 {{else if lt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalIncome 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    <th class="cost-left">{{$secondaryCostCentresWithBudgetLines.SecondaryCostCentreName}}</th>
+                    <th class="hide-on-mobile hide-on-half-desktop cost-left"></th>
+                    <th class="hide-on-mobile {{if gt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalIncome 0}} positive {{else if lt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalIncome 0}} negative {{else}} net{{end}}" >
                         {{formatMoney $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalIncome}} kr</th>
-                    <th class="hide-on-mobile"
-                        style="color: {{if gt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalExpense 0}} #4CAF50 {{else if lt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalExpense 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    <th class="hide-on-mobile {{if gt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalExpense 0}} positive {{else if lt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalExpense 0}} negative {{else}} net{{end}}" >
                         {{formatMoney $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalExpense}} kr</th>
-                    <th
-                        style="color: {{if gt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalResult 0}} #4CAF50 {{else if lt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalResult 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    <th class="{{if gt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalResult 0}} positive {{else if lt $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalResult 0}} negative {{else}} net{{end}}" >
                         {{formatMoney $secondaryCostCentresWithBudgetLines.SecondaryCostCentreTotalResult}} kr</th>
                 </tr>
                 {{range $_, $budgetLines := $secondaryCostCentresWithBudgetLines.BudgetLines}}
                 <tr>
-                    <td style="white-space: wrap; color:black">{{$budgetLines.BudgetLineName}}</td>
-                    <td class="hide-on-mobile hide-on-half-desktop">{{$budgetLines.BudgetLineAccount}}</td>
-                    <td class="hide-on-mobile"
-                        style="color: {{if gt $budgetLines.BudgetLineIncome 0}} #4CAF50 {{else if lt $budgetLines.BudgetLineIncome 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    <td>{{$budgetLines.BudgetLineName}}</td>
+                    <td class="hide-on-mobile hide-on-half-desktop cost-left">{{$budgetLines.BudgetLineAccount}}</td>
+                    <td class="hide-on-mobile {{if gt $budgetLines.BudgetLineIncome 0}} positive {{else if lt $budgetLines.BudgetLineIncome 0}} negative {{else}} net{{end}}">
                         {{formatMoney $budgetLines.BudgetLineIncome}} kr</td>
-                    <td class="hide-on-mobile"
-                        style="color: {{if gt $budgetLines.BudgetLineExpense 0}} #4CAF50 {{else if lt $budgetLines.BudgetLineExpense 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                    <td class="hide-on-mobile {{if gt $budgetLines.BudgetLineExpense 0}} positive {{else if lt $budgetLines.BudgetLineExpense 0}} negative {{else}} net{{end}}">
                         {{formatMoney $budgetLines.BudgetLineExpense}} kr</td>
                     <td
-                        style="color: {{if gt ( add $budgetLines.BudgetLineIncome $budgetLines.BudgetLineExpense ) 0}} #4CAF50 {{else if lt ( add $budgetLines.BudgetLineIncome $budgetLines.BudgetLineExpense ) 0}} #E57373 {{else}} black{{end}}; text-align: right;">
+                        class="{{if gt ( add $budgetLines.BudgetLineIncome $budgetLines.BudgetLineExpense ) 0}} positive {{else if lt ( add $budgetLines.BudgetLineIncome $budgetLines.BudgetLineExpense ) 0}} negative {{else}} net{{end}}">
                         {{formatMoney ( add $budgetLines.BudgetLineIncome $budgetLines.BudgetLineExpense )}} kr</td>
                     </td>
                 </tr>
@@ -69,8 +62,7 @@
                 {{end}}
             </table>
         </div>
-        <br><br><br><br><br><br><br>
-        <footer class="footer-toolbar" style="align-items: center; text-align: center;">
+        <footer class="footer-toolbar">
             <p>{{ .motd }} © 2024 GOrdian</p>
             Budgetsystemet är skrivet av <a href="https://github.com/DouglasFischer">Douglas Fischer</a>
         </footer>

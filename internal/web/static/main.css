@@ -2,15 +2,47 @@
 
 h1 {
     text-align: center;
-    padding-top: 20px;
+    padding-top: 20px; 
 }
+
+#content table td {
+    white-space: wrap; 
+    color:black;
+    text-align: right;
+}
+
+#content table th {
+    color: #333;
+ }
+ 
+#content table tr:first-child th,
+#content table tr:first-child td {
+    font-size: 15pt;
+}
+
+ #content table tr th:first-child {
+    text-align: left;
+ }
+
+ #content table tr td:first-child {
+    text-align: left;
+    color: black;
+ }
+ 
+ #content table tr th,
+ #content table tr td {
+     text-align: right;
+ }
 
 #costCentreNames {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
+    padding-left: 40px;
+    padding-right: 40px;
+    padding-bottom: 100px;
 }
 
-#costCentreNames a {
+#costCentreNames a { 
     text-align: center;
     color:green;
     display: block;
@@ -20,28 +52,16 @@ h1 {
     font-weight: bold;
 }
 
-#costCentreNames ul {
-    text-align: left;
-    list-style-type: none;
-    line-height: 1.6;
-}
-
-#costCentreNames ul li {
-    text-align: left;
-    justify-content: left;
-}
-
-
 #costCentreNames >div {
     display: flex;
     align-items: center;
     flex-direction: column;
 }
 
-#costCentre h1 {
-    padding-top: 2em;
-    text-align: center;
+#costCentre {
+    padding-bottom: 100px;
 }
+
 #costCentre div {
     display: flex;
     align-items: center;
@@ -58,21 +78,20 @@ h1 {
 }
 
 #costCentre table th {
-    text-align: left;
+    text-align: right;
     width: 3em;
     padding: 8px;
     font-size: 13pt;
     transition: none;
-    white-space: nowrap;
 }
 
 #costCentre table td {
-    text-align: left;
+    text-align: right;
     padding: 5px;
     font-size: 12pt;
     transition: none;
     border-bottom: 1px solid #d6d9db;
-    white-space: nowrap;
+    color: black;
 }
 
 #costCentre tbody tr:hover {
@@ -100,25 +119,86 @@ h1 {
     .hide-on-half-desktop {
         display: none;
     }
+
+    .page-title h1 {
+        font-size: 38px !important;
+    }
+
 }
+
+
+@media screen and (max-width: 1020px) {
+
+    #costCentreNames {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .btn-group ul {
+        grid-template-columns: 1fr;
+    }
+
+    .btn-group button {
+        display: inline-block;
+        font-size: 15px;
+        padding: 10px 3px;
+        width: 45vw;
+}
+
+}
+
 
 .btn-group button {
     background-color: #d4d4d4;
     color: rgb(0, 0, 0);
     border-radius: 10px;
-    padding: 4px;
     margin: 5px;
     cursor: pointer; 
 }
 
-.centering { /* Oklart vad du vill döpa den till */
+.centering { 
     display:flex; 
     justify-content: center;
 }
 
-div.page-title { /* För att fixa "header" */ 
+.costCentre-group div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+   /* background-color: lightgreen;*/
+}
+
+.cost-left {
+    text-align: left !important;
+}
+
+div.page-title { 
     background-color: #78909C !important; 
     color: white; 
     padding-top: 35px;
     padding-bottom: 15px;
+}
+.page-title h1 {
+    font-weight: bolder; 
+    font-size: 42px;
+}
+
+.footer-toolbar {
+    align-items: center; 
+    text-align: center;
+}
+
+.positive {
+    color: #4CAF50 !important;
+}
+
+.negative {
+   color: #E57373 !important;
+}
+
+.net {
+    color: black !important;
+}
+
+th.net {
+    color: #333;
 }

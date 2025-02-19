@@ -4,7 +4,7 @@
 <body>
 <div id="methone-container-replace"></div>
 <div class="page-title">
-    <h1 style="font-weight: bolder; font-size: 42px;">Resultatrapport</h1>
+    <h1>Resultatrapport</h1>
 </div>
 <div class="centering">
 <h2>Vad har spenderats på min budgetpost?</h2>
@@ -47,16 +47,16 @@
     <div id="content">  
         <table>
             <tr style="background-color: rgb(176,190,197) !important;">
-                <th style="font-size: 15pt;">Nämnd/Projekt</th>
-                <th style="font-size: 15pt;">Spenderat</th>
+                <th>Nämnd/Projekt</th>
+                <th>Spenderat</th>
                 {{if eq $.CurrentYear $.SelectedYear}}
-                    <th style="font-size: 15pt;">Budgeterat</th>
+                    <th>Budgeterat</th>
                 {{end}}
             </tr>
             <tr style="height: 1em;"></tr>
             {{range $_, $ReportCostCentreLine := .report }}
                 <tr style="background-color: rgb(176,190,197) !important;">
-                    <th style="font-size: 15pt;">{{$ReportCostCentreLine.CostCentreName}}</th>
+                    <th>{{$ReportCostCentreLine.CostCentreName}}</th>
                     <th>
                         {{$ReportCostCentreLine.Total}} kr
                     </th>
@@ -90,14 +90,14 @@
                     </tr>
                     {{range $_, $ReportBudgetLine := $ReportSecondaryCostCentreLine.BudgetLinesList}}
                         <tr>
-                            <td style="white-space: wrap; color:black">  
+                            <td class="net">  
                                 {{$ReportBudgetLine.BudgetLineName}}
                             </td>
-                            <td style="white-space: wrap; color:black">  
+                            <td class="net">  
                                 {{$ReportBudgetLine.Total}} kr
                             </td>
                             {{if eq $.CurrentYear $.SelectedYear}}
-                                <td style="white-space: wrap; color:black">
+                                <td class="net">
                                     {{if $ReportBudgetLine.Budget}}
                                         {{$ReportBudgetLine.Budget}} kr
                                     {{else}}
@@ -114,8 +114,7 @@
         </table>
     </div>
 </div>
-<br><br><br><br><br><br><br>
-<footer class="footer-toolbar" style="align-items: center; text-align: center;">
+<footer class="footer-toolbar">
     <p>{{ .motd }} © 2024 GOrdian</p>
     Budgetsystemet är skrivet av <a href="https://github.com/DouglasFischer">Douglas Fischer</a>
 </footer>

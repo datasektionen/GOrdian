@@ -210,8 +210,8 @@ func motdGenerator() string {
 		"Kom på hackerkvällarna!",
 		"12345690,+",
 		"���pd�v�.�n��-���j\"��F�L!h��n",
-		"Moo Deng made me do it",
-	}
+		"Moo Deng!",
+		"Receipts 👏 Proof 👏 Timeline 👏 Screenshots 👏"}
 	randomIndex := rand.Intn(len(options))
 	return options[randomIndex]
 }

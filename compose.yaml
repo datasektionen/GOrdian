@@ -1,6 +1,8 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      target: code
     init: true
     ports: [ 3000:3000 ]
     environment:
@@ -20,8 +22,12 @@ services:
         condition: service_healthy
     develop:
       watch:
-        - action: rebuild
-          path: .
+        - path: .
+          action: sync+restart
+          target: /src/
+        - path: go.sum
+          action: rebuild
+    command: go run .
   gordian-db:
     image: postgres:16-alpine
     environment:

@@ -1,6 +1,5 @@
 ARG GO_VERSION=1.22
 ARG ALPINE_VERSION=3.19
-ARG UID=10001
 
 FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS code
 
@@ -19,6 +18,8 @@ FROM code AS build
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=cache,target=/root/.cache/go-build/ \
     CGO_ENABLED=0 go build -o /bin/server ./
+
+ARG UID=10001
 
 FROM alpine:${ALPINE_VERSION}
 

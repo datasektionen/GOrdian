@@ -57,8 +57,8 @@ func getYearsSince2017() []string {
 
 func reportPage(w http.ResponseWriter, r *http.Request, databases Databases, perms []string, loggedIn bool) error {
 
-	//currentYear := strconv.Itoa(time.Now().Year())
-	currentYear := "2024"
+	currentYear := strconv.Itoa(time.Now().Year())
+	//currentYear := "2024"
 
 	selectedYear := r.FormValue("year")
 	if selectedYear == "" {
@@ -193,8 +193,8 @@ func findOrAddSecondaryCostCentre(secCostCentres *[]ReportSecondaryCostCentreLin
 func StructureReportLines(cashflowLines []CashflowLine, simpleBudgetLines []SimpleBudgetLine, selectedYear string) ([]ReportCostCentreLine, error) {
 	var costCentres []ReportCostCentreLine
 
-	//currentYear := strconv.Itoa(time.Now().Year())
-	currentYear := "2024"
+	currentYear := strconv.Itoa(time.Now().Year())
+	//currentYear := "2024"
 
 	// Process CashflowLines
 	for _, line := range cashflowLines {

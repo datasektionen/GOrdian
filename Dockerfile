@@ -19,9 +19,8 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=cache,target=/root/.cache/go-build/ \
     CGO_ENABLED=0 go build -o /bin/server ./
 
-ARG UID=10001
-
 FROM alpine:${ALPINE_VERSION}
+ARG UID=10001
 
 RUN adduser --disabled-password --gecos "" --home /nonexistent --shell "/sbin/nologin" \
     --no-create-home --uid "${UID}" user

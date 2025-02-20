@@ -208,7 +208,10 @@ func motdGenerator() string {
 		"Kassörens bästa vän:",
 		"Brought to you by FIPL consulting:",
 		"Kom på hackerkvällarna!",
-		"12345690,+"}
+		"12345690,+",
+		"���pd�v�.�n��-���j\"��F�L!h��n",
+		"Moo Deng made me do it",
+	}
 	randomIndex := rand.Intn(len(options))
 	return options[randomIndex]
 }

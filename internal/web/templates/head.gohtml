@@ -25,17 +25,21 @@
         login_text: {{if .loggedIn}}"Logga ut"{{else}}"Logga in"{{end}}, // Default null, null hides button
         login_href: {{if .loggedIn}}"/logout"{{else}}"/login"{{end}},
         links: [
-          {
-          str: "Hem",
-          href: "/",
-          },
-          {
-            str: "Rambudget",
-            href: "/framebudget",
-          },
+            {
+                str: "Hem",
+                href: "/",
+            },
+            {
+                str: "Rambudget",
+                href: "/framebudget",
+            },
             {
                 str: "Resultatrapport",
                 href: "/resultreport",
+            },
+            {
+                str: "Tidigare Budgetar",
+                href: "/history",
             },
             {{if sliceContains .permissions "admin" "view-all" }} {
                 str: "Administrera",

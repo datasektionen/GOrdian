@@ -51,6 +51,7 @@ func Mount(mux *http.ServeMux, databases Databases) error {
 	mux.Handle("/api/SecondaryCostCentres", cors(route(databases, apiSecondaryCostCentre)))
 	mux.Handle("/api/BudgetLines", cors(route(databases, apiBudgetLine)))
 	mux.Handle("/framebudget", authRoute(databases, framePage, []string{}))
+	mux.Handle("/history", authRoute(databases, historyPage, []string{}))
 
 	if databases.DBCF != nil {
 		mux.Handle("/resultreport", authRoute(databases, reportPage, []string{}))
@@ -164,6 +165,17 @@ func formatMoney(value int) string {
 
 func adminPage(w http.ResponseWriter, r *http.Request, databases Databases, perms []string, loggedIn bool) error {
 	if err := templates.ExecuteTemplate(w, "admin.gohtml", map[string]any{
+		"motd":        motdGenerator(),
+		"permissions": perms,
+		"loggedIn":    loggedIn,
+	}); err != nil {
+		return fmt.Errorf("could not render template: %w", err)
+	}
+	return nil
+}
+
+func historyPage(w http.ResponseWriter, r *http.Request, databases Databases, perms []string, loggedIn bool) error {
+	if err := templates.ExecuteTemplate(w, "history.gohtml", map[string]any{
 		"motd":        motdGenerator(),
 		"permissions": perms,
 		"loggedIn":    loggedIn,

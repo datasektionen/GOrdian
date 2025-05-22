@@ -5,7 +5,9 @@ job "gordian" {
 
   group "gordian" {
     network {
-      port "http" { }
+      port "http" {
+        to = 3000 # hardcoded (config option never used, see #32)
+      }
     }
 
     service {
